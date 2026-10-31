@@ -1,0 +1,257 @@
+### UI Corner Radius Rule (Apple-Style Squircle)
+
+Use Apple's Squircle / Superellipse-inspired corner geometry consistently throughout the entire application.
+
+**Rules:**
+1. Never use arbitrary or inconsistent `border-radius` values.
+2. Prefer smooth, continuous superellipse-style corners over conventional rounded rectangles.
+3. Use the same corner-radius system across cards, buttons, input fields, dialogs, modals, application tiles, dropdowns and containers.
+4. Maintain consistent corner geometry across responsive layouts.
+5. Avoid excessive rounding that makes components look pill-shaped unless intentionally required.
+6. Do not mix sharp corners, standard rounded corners and squircle corners randomly.
+
+**Implementation:**
+- Use `corner-shape: superellipse(4)` where supported.
+- Provide graceful fallbacks for unsupported browsers.
+- Centralize corner-radius values using CSS variables.
+- Keep circular elements genuinely circular.
+
+**Design objective:** Achieve Apple's refined, smooth, continuous squircle aesthetic throughout the UI while maintaining a consistent and professional design system.
+
+### Liquid Glass: Strict Monochrome Color Restriction
+
+The entire Liquid Glass design system must use ONLY black, white and neutral grey shades.
+
+**Absolute Rules:**
+1. No gradients of any kind. This includes linear, radial, conic and mesh gradients.
+2. No additional colours, including blue, purple, orange, green, red or other accent colours.
+3. Use only monochromatic shades: pure black, pure white and neutral greys.
+4. Glass transparency must come from opacity and backdrop filtering, never coloured overlays.
+5. Reflections, highlights, borders and shadows must remain neutral monochrome.
+6. Do not introduce coloured glow, coloured shadows or tinted glass effects.
+
+**Dark Theme**
+- Black and charcoal glass surfaces.
+- White and soft-grey reflections.
+- Subtle grey borders.
+- Neutral translucent layers.
+
+**Light Theme**
+- White and translucent white glass surfaces.
+- Light-grey borders and shadows.
+- Black and dark-grey typography.
+- Neutral reflections.
+
+**Visual Consistency**
+- Preserve the original Liquid Glass material appearance.
+- Use transparency, depth, blur, light and contrast to create visual richness.
+- Do not compensate for the absence of colour by adding gradients or excessive shadows.
+- Maintain accessibility and readability in both themes.
+
+**Final Design Principle:** Black + White + Neutral Grey only. No gradients. No additional colours. No exceptions.
+
+### Rule 03: Responsive Typography & Device-Based Scaling
+
+All typography must automatically adapt to the device's screen width and height while maintaining a consistent visual hierarchy.
+
+**Absolute Rules:**
+
+1. Never use fixed font sizes that cause overflow, clipping or poor readability across devices.
+2. Use responsive CSS typography with `clamp()`, `rem`, `vw` and media queries where appropriate.
+3. Font sizes must adapt intelligently to screen dimensions, not just screen width.
+4. Maintain consistent typography hierarchy across desktop, laptop, tablet and mobile.
+5. Do not make mobile typography unnecessarily small to fit more content.
+6. Prevent text clipping, overlapping, unwanted wrapping and horizontal scrolling.
+7. Maintain comfortable line height, letter spacing and readable paragraph widths.
+
+**Typography Hierarchy:**
+
+- Display headings: Large, responsive and visually prominent.
+- Page headings: Clearly distinguishable from section headings.
+- Section headings: Balanced and consistent.
+- Body text: Comfortable and readable.
+- Secondary text: Slightly smaller but still accessible.
+- Labels and metadata: Compact without becoming difficult to read.
+- Buttons and inputs: Readable and consistent across devices.
+
+**Device Adaptation:**
+
+- Desktop: Use available space effectively without excessively large typography.
+- Laptop: Maintain balanced typography and visual density.
+- Tablet: Scale typography and spacing appropriately.
+- Mobile: Prioritize readability, compact layouts and touch-friendly controls.
+- Small-height screens: Prevent headings and content from consuming excessive vertical space.
+
+**Technical Implementation:**
+
+- Prefer `clamp()` for fluid typography.
+- Use CSS variables for centralized font-size tokens.
+- Consider both viewport width and height for layouts where vertical space matters.
+- Use `rem` for accessible scaling.
+- Use breakpoints only when fluid scaling is insufficient.
+- Respect browser zoom and user accessibility settings.
+
+**Consistency Requirements:**
+
+- Maintain the same font family and typography personality across themes.
+- Preserve visual hierarchy across all application pages.
+- Avoid arbitrary font-size values in individual components.
+- Reuse centralized typography tokens.
+
+**Final Design Principle:** Typography must feel naturally designed for the device, not like a desktop interface squeezed onto a mobile screen.
+
+### Rule 04: Apple-Inspired Liquid Motion & Smooth Transitions
+
+All animations and transitions throughout the application must follow the fluid, natural and refined motion language of Apple's Liquid Glass design.
+
+**Core Principles:**
+
+1. Every UI interaction should feel smooth, fluid and intentional.
+2. Transitions should feel like glass surfaces moving, expanding, shrinking and settling naturally.
+3. Avoid abrupt changes, robotic animations and unnecessary movement.
+4. Use natural easing curves rather than linear transitions.
+5. Maintain consistent animation timing and motion behaviour throughout the application.
+
+**Animation Requirements:**
+
+- Page transitions: Smooth and subtle transitions between pages.
+- Modal and dialog: Natural scale and opacity transitions with smooth entry and exit.
+- Dropdowns and popovers: Fluid expansion and collapse.
+- Navigation: Smooth movement between active navigation states.
+- Buttons: Subtle press, release and hover feedback.
+- Cards: Gentle elevation and surface transitions.
+- Theme switching: Smooth transition between light and dark themes.
+- Liquid Glass surfaces: Subtle changes in blur, opacity, highlights and depth.
+- Loading states: Smooth and unobtrusive animations.
+- Expandable sections: Natural height and content transitions.
+
+**Motion Characteristics:**
+
+- Use spring-like or physics-inspired easing where appropriate.
+- Prefer ease-out for entering elements.
+- Prefer ease-in for exiting elements.
+- Use smooth interpolation for movement, scale, opacity and blur.
+- Avoid excessive bouncing, elastic effects and dramatic zooming.
+- Avoid animating every element simultaneously.
+- Use staggered animations only when they improve visual flow.
+
+**Technical Standards:**
+
+- Use CSS transitions and keyframes for lightweight interactions.
+- Use Framer Motion or Motion for React when complex coordinated animations are required.
+- Prefer `transform` and `opacity` for performant animations.
+- Avoid unnecessary layout-triggering animations.
+- Keep animations GPU-friendly.
+- Prevent animation conflicts and overlapping transitions.
+- Use consistent duration and easing tokens.
+- Respect `prefers-reduced-motion` accessibility settings.
+
+**Suggested Motion Tokens:**
+
+- Micro-interactions: 120–180ms
+- Standard transitions: 200–300ms
+- Modal and panel transitions: 300–450ms
+- Complex page transitions: 350–500ms
+
+**Important Restrictions:**
+
+- No sudden popping or disappearing elements.
+- No excessive bouncing or spinning.
+- No unnecessary animation delays.
+- No distracting continuous animations.
+- Never sacrifice performance or usability for visual effects.
+
+**Final Design Principle:** The entire interface should feel like one continuous, responsive material. Every interaction should be fluid, elegant, subtle and consistent with Apple's Liquid Glass motion aesthetic.
+
+### Rule 05: Modular Architecture, File Separation & Reusability
+
+Maintain a clean, scalable and well-organized project structure. Every file must have a clear responsibility. Never put the entire application logic, UI, data or configuration into a single file.
+
+**Absolute Rules:**
+
+1. Create separate files according to their responsibilities and actual usage.
+2. Never create unnecessarily lengthy files containing unrelated components, functions, logic or data.
+3. Break large components into smaller, reusable components.
+4. Keep UI components, business logic, API calls, utilities, hooks, types, constants and configurations separated.
+5. Reuse existing components, functions, hooks and utilities whenever possible instead of duplicating code.
+6. Before creating a new file or component, check whether an existing one can be extended or reused.
+7. Never duplicate the same logic across multiple files.
+8. Do not place all application data, configurations, constants or API logic in one central file.
+9. When a feature contains multiple components or supporting files, create a dedicated feature folder.
+10. Keep imports clean and avoid unnecessary dependencies.
+
+**Folder Organization:**
+
+- Create dedicated folders for features with multiple related files.
+- Group components according to their functionality.
+- Separate shared components from feature-specific components.
+- Keep API services and data-access logic independent of UI components.
+- Organize hooks, utilities, types and constants into appropriate folders.
+- Maintain a predictable naming convention throughout the project.
+
+**Code Quality:**
+
+- Each file should have one primary responsibility.
+- Keep functions focused and reasonably short.
+- Avoid deeply nested folders without a practical reason.
+- Avoid unnecessary abstractions and excessive fragmentation.
+- Use clear, descriptive file and folder names.
+- Remove unused code, duplicate logic and obsolete files when safe.
+- Preserve existing functionality when refactoring.
+
+**Before Implementing Any Feature:**
+
+1. Inspect the existing project structure.
+2. Identify reusable components and existing utilities.
+3. Determine which files need to be created or modified.
+4. Create dedicated folders when a feature requires multiple related files.
+5. Implement the feature using the existing architecture and conventions.
+6. Verify imports, dependencies and functionality after implementation.
+
+**Important Restrictions:**
+
+- Never put everything into `page.tsx`, `page.jsx`, `index.tsx` or a single component file.
+- Never create giant files just to reduce the number of files.
+- Never duplicate components simply because they are used on different pages.
+- Never refactor unrelated modules unnecessarily.
+
+**Final Design Principle:** Keep the codebase modular, reusable, maintainable, readable and scalable. Organize code according to responsibility, not convenience.
+
+### Rule 06: Complete Removal, Cleanup & Dead Code Prevention
+
+Whenever a feature, component, function, page, dependency or functionality is removed, ensure it is completely removed from the project without leaving unused or obsolete code behind.
+
+**Absolute Rules:**
+
+1. Never leave dead code after removing a feature or functionality.
+2. Remove all associated unused components, functions, hooks, variables, imports, styles and configurations.
+3. Remove obsolete API endpoints, service functions and related logic when they are no longer used.
+4. Remove unused CSS classes, animations, design tokens and responsive styles associated with deleted components.
+5. Remove outdated dependencies and packages only after verifying they are no longer required elsewhere.
+6. Remove obsolete routes, navigation links, menu items and references.
+7. Remove unused database models, fields, migrations or schemas only when safe and after checking data dependencies.
+8. Do not leave commented-out code as a substitute for proper removal.
+9. Do not keep duplicate implementations or abandoned alternative versions.
+10. Check the entire project for references to removed functionality.
+
+**Cleanup Procedure:**
+
+Whenever something is removed:
+
+1. Identify the complete dependency chain of the functionality.
+2. Locate every file and reference associated with it.
+3. Remove the intended functionality and its obsolete supporting code.
+4. Clean up unused imports, variables, styles and dependencies.
+5. Verify that no broken references or orphaned files remain.
+6. Run relevant linting, type checks and build checks.
+7. Confirm that unrelated functionality continues to work.
+
+**Important Safety Restrictions:**
+
+- Never delete shared components or utilities that are still being used elsewhere.
+- Never delete user data or production database records as part of ordinary code cleanup.
+- Never remove functionality outside the requested scope.
+- Never delete migrations or historical records blindly.
+- If a dependency is uncertain, investigate before deleting it.
+
+**Final Design Principle:** If functionality is removed, its obsolete implementation must be removed completely too. Keep the codebase clean, lean and free from dead code, unused files and abandoned logic.
