@@ -34,3 +34,4 @@ with open(os.path.join(ROOT, "public", "icons", "logo.svg"), "w", encoding="utf-
     f.write(svg_dark)
 
 print("Authentic SVG files successfully written!")
+

@@ -185,3 +185,4 @@ if os.path.exists(android_res):
             splash_bg.save(os.path.join(df_path, "splash.png"))
 
 print("All authentic icons generated successfully!")
+
