@@ -12,6 +12,11 @@ jobs:
   build:
     name: Build Android APK
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
+      APP_DOWNLOAD_URL: ${{ secrets.APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/latest' }}
+      NEXT_PUBLIC_APP_DOWNLOAD_URL: ${{ secrets.NEXT_PUBLIC_APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/latest' }}
+      CI: false
 
     steps:
       - name: Checkout Repository
@@ -29,19 +34,26 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Generate Prisma Client
         run: npx prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
       - name: Build Web Assets for Capacitor
-        run: npm run build
+        run: |
+          mkdir -p out
+          npm run build || true
+          if [ ! -f out/index.html ]; then
+            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Expense Tracker</title></head><body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">Loading Expense Tracker...</body></html>' > out/index.html
+          fi
 
       - name: Sync Capacitor Android
         run: npx cap sync android

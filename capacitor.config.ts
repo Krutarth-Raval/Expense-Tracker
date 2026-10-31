@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Expense Tracker',
   webDir: 'out',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    ...(process.env.CAPACITOR_SERVER_URL ? { url: process.env.CAPACITOR_SERVER_URL, cleartext: true } : {})
   }
 };
 
