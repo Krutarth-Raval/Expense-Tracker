@@ -2,7 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { NavigationProvider } from "@/context/NavigationContext";
 import { Navbar } from "@/components/layout/Navbar";
+import { BottomBarWrapper } from "@/components/layout/BottomBarWrapper";
+import { SplashScreen } from "@/components/auth/SplashScreen";
+import { AmbientBackground } from "@/components/ui/AmbientBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,10 +59,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col safe-top antialiased">
+      <body className="min-h-full flex flex-col antialiased bg-background text-text-primary relative overflow-x-hidden">
         <ThemeProvider>
-          <Navbar />
-          <main className="flex-1 flex flex-col w-full">{children}</main>
+          <AuthProvider>
+            <NavigationProvider>
+              <AmbientBackground />
+              <SplashScreen />
+              <Navbar />
+              <main className="flex-1 flex flex-col w-full pb-24 sm:pb-28">{children}</main>
+              <BottomBarWrapper />
+            </NavigationProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

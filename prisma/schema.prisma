@@ -7,6 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  password            String
+  salaryDate          DateTime?
+  salaryDay           Int?     @default(7)
+  salaryAmount        Float?
+  initialSavings      Float?   @default(0)
+  initialMonthBalance Float?   @default(0)
+  onboardingCompleted Boolean  @default(false)
+  defaultPaymentApp   String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  otps                OtpVerification[]
+}
+
+model OtpVerification {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+
+  @@index([email])
+}
+
 model Transaction {
   id          String   @id @default(cuid())
   amount      Float
@@ -34,8 +63,7 @@ model Budget {
 model AccountSummary {
   id          String   @id @default(cuid())
   accountName String   @default("Main Wallet")
-  currency    String   @default("USD")
+  currency    String   @default("INR")
   balance     Float    @default(0.0)
   updatedAt   DateTime @updatedAt
 }
-

@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@animateicons/react": "^0.13.0",
     "@capacitor/core": "^8.6.0",
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
+    "jspdf": "^4.2.1",
+    "jsqr": "^1.4.0",
     "lucide-react": "^1.66.0",
+    "motion": "^14.9.0",
     "next": "16.4.3",
+    "nodemailer": "^10.3.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwind-merge": "^3.7.0"
@@ -23,12 +29,14 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/cli": "^8.6.0",
     "@tailwindcss/turbopack": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
-    "prisma": "^7.10.1",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

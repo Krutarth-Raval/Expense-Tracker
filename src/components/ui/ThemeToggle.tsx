@@ -1,52 +1,153 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore, useRef, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
+import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useTheme } from "@/context/ThemeContext";
 
+const subscribe = () => () => {};
+
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const shouldReduceMotion = useReducedMotion();
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  );
+
+  const isDark = theme === "dark";
+  const indicatorControls = useAnimationControls();
+  const isFirstRender = useRef(true);
+  const prevDarkRef = useRef(isDark);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!mounted) return;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      indicatorControls.set({
+        x: isDark ? "calc(100% + var(--toggle-gap))" : "0%",
+        scale: 1,
+      });
+      prevDarkRef.current = isDark;
+      return;
+    }
+
+    if (prevDarkRef.current === isDark) {
+      return;
+    }
+    prevDarkRef.current = isDark;
+
+    if (shouldReduceMotion) {
+      indicatorControls.set({
+        x: isDark ? "calc(100% + var(--toggle-gap))" : "0%",
+        scale: 1,
+      });
+      return;
+    }
+
+    // Zoom In (1.0 -> 1.12), Travel, Settle (1.12 -> 1.0)
+    indicatorControls.start({
+      x: isDark ? "calc(100% + var(--toggle-gap))" : "0%",
+      scale: [1, 1.12, 1],
+      transition: {
+        x: {
+          type: "spring",
+          stiffness: 320,
+          damping: 26,
+          mass: 0.85,
+        },
+        scale: {
+          duration: 0.45,
+          times: [0, 0.38, 1],
+          ease: [0.16, 1, 0.3, 1],
+        },
+      },
+    });
+  }, [isDark, mounted, indicatorControls, shouldReduceMotion]);
 
   if (!mounted) {
     return (
-      <div 
-        className="w-10 h-10 squircle rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/15 opacity-50"
+      <div
+        className="rounded-full liquid-glass border border-black/15 dark:border-white/25 opacity-50 flex-shrink-0"
+        style={{
+          width: "calc(var(--toggle-btn-size) * 2 + var(--toggle-gap) + var(--toggle-pad) * 2)",
+          height: "calc(var(--toggle-btn-size) + var(--toggle-pad) * 2)",
+        }}
         aria-hidden="true"
       />
     );
   }
 
-  const isDark = theme === "dark";
-
   return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-      className="relative w-10 h-10 squircle rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 active:scale-95 border border-black/10 dark:border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)] backdrop-blur-md flex items-center justify-center cursor-pointer transition-all duration-150"
+    <div
+      role="radiogroup"
+      aria-label="Theme selection"
+      className="relative flex items-center rounded-full squircle-nav liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 shadow-lg select-none flex-shrink-0"
+      style={{
+        padding: "var(--toggle-pad)",
+        gap: "var(--toggle-gap)",
+      }}
     >
-      <span className="sr-only">Toggle theme</span>
-      <div className="relative w-5 h-5 flex items-center justify-center">
-        {/* Sun Icon */}
+      {/* Single Shared Animated Glass Indicator: Zoom, Travel & Settle */}
+      <motion.div
+        className="absolute rounded-full liquid-glass-active-pill border border-black/15 dark:border-white/30 shadow-md pointer-events-none"
+        style={{
+          top: "var(--toggle-pad)",
+          bottom: "var(--toggle-pad)",
+          left: "var(--toggle-pad)",
+          width: "var(--toggle-btn-size)",
+          height: "var(--toggle-btn-size)",
+        }}
+        animate={indicatorControls}
+      />
+
+      {/* Light Mode Button */}
+      <button
+        type="button"
+        role="radio"
+        aria-checked={!isDark}
+        aria-label="Switch to light theme"
+        onClick={() => setTheme("light")}
+        className="relative z-10 rounded-full squircle-btn flex items-center justify-center cursor-pointer focus:outline-none"
+        style={{
+          width: "var(--toggle-btn-size)",
+          height: "var(--toggle-btn-size)",
+        }}
+      >
         <Sun
-          className={`w-4.5 h-4.5 text-neutral-800 dark:text-neutral-200 absolute transition-all duration-200 ease-out ${
-            isDark ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+          className={`relative z-20 w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors duration-200 ${
+            !isDark
+              ? "text-text-primary"
+              : "text-text-muted hover:text-text-secondary"
           }`}
-          strokeWidth={1.8}
+          strokeWidth={1.9}
         />
-        {/* Moon Icon */}
+      </button>
+
+      {/* Dark Mode Button */}
+      <button
+        type="button"
+        role="radio"
+        aria-checked={isDark}
+        aria-label="Switch to dark theme"
+        onClick={() => setTheme("dark")}
+        className="relative z-10 rounded-full squircle-btn flex items-center justify-center cursor-pointer focus:outline-none"
+        style={{
+          width: "var(--toggle-btn-size)",
+          height: "var(--toggle-btn-size)",
+        }}
+      >
         <Moon
-          className={`w-4.5 h-4.5 text-neutral-200 absolute transition-all duration-200 ease-out ${
-            isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+          className={`relative z-20 w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors duration-200 ${
+            isDark
+              ? "text-text-primary"
+              : "text-text-muted hover:text-text-secondary"
           }`}
-          strokeWidth={1.8}
+          strokeWidth={1.9}
         />
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }

@@ -1,29 +1,45 @@
-### UI Corner Radius Rule (Apple-Style Squircle)
+### Rule 01: Apple Squircle Geometry & Global Corner Consistency
 
-Use Apple's Squircle / Superellipse-inspired corner geometry consistently throughout the entire application.
+Implement genuine squircle-style corner geometry consistently across the entire application.
 
-**Rules:**
-1. Never use arbitrary or inconsistent `border-radius` values.
-2. Prefer smooth, continuous superellipse-style corners over conventional rounded rectangles.
-3. Use the same corner-radius system across cards, buttons, input fields, dialogs, modals, application tiles, dropdowns and containers.
-4. Maintain consistent corner geometry across responsive layouts.
-5. Avoid excessive rounding that makes components look pill-shaped unless intentionally required.
-6. Do not mix sharp corners, standard rounded corners and squircle corners randomly.
+**Mandatory Implementation:**
 
-**Implementation:**
-- Use `corner-shape: superellipse(4)` where supported.
-- Provide graceful fallbacks for unsupported browsers.
-- Centralize corner-radius values using CSS variables.
+1. Use `corner-shape: squircle` or `corner-shape: superellipse(2)` for supported browsers.
+2. Always define a non-zero `border-radius` alongside `corner-shape`.
+3. Do not use `superellipse(4)` as the default squircle value.
+4. Centralize corner geometry into reusable CSS variables and design tokens.
+5. Apply squircle geometry to cards, containers, navigation, buttons, inputs, dialogs, modals, dropdowns and application tiles.
+6. Do not allow individual components to introduce arbitrary corner styles.
+
+**Browser Compatibility:**
+
+- Use `@supports (corner-shape: squircle)` to detect support.
+- For unsupported browsers, provide a carefully designed fallback.
+- If exact squircle geometry is required, use an appropriate SVG or custom shape implementation rather than pretending ordinary border-radius is identical.
+
+**Radius Consistency:**
+
+- Define a consistent radius scale based on component size.
+- Maintain the same corner curvature across related components.
+- Avoid tiny default rounded corners and sharp rectangular surfaces.
 - Keep circular elements genuinely circular.
 
-**Design objective:** Achieve Apple's refined, smooth, continuous squircle aesthetic throughout the UI while maintaining a consistent and professional design system.
+**Verification:**
 
-### Liquid Glass: Strict Monochrome Color Restriction
+- Inspect computed styles of actual rendered components.
+- Verify that `corner-shape` is active and not overridden.
+- Visually inspect cards, buttons, navigation and modals.
+- Test desktop and mobile layouts.
 
-The entire Liquid Glass design system must use ONLY black, white and neutral grey shades.
+**Strict Requirement:** Ordinary `border-radius` alone is not considered successful implementation. The intended squircle geometry must be visibly present.
+
+### Rule 02: Apple Liquid Glass & Strict Monochrome Color Restriction
+
+The entire application must follow Apple's Liquid Glass-inspired design language using ONLY black, white and neutral grey shades.
 
 **Absolute Rules:**
-1. No gradients of any kind. This includes linear, radial, conic and mesh gradients.
+
+1. No gradients of any kind, including linear, radial, conic or mesh gradients.
 2. No additional colours, including blue, purple, orange, green, red or other accent colours.
 3. Use only monochromatic shades: pure black, pure white and neutral greys.
 4. Glass transparency must come from opacity and backdrop filtering, never coloured overlays.
@@ -43,12 +59,15 @@ The entire Liquid Glass design system must use ONLY black, white and neutral gre
 - Neutral reflections.
 
 **Visual Consistency**
-- Preserve the original Liquid Glass material appearance.
-- Use transparency, depth, blur, light and contrast to create visual richness.
-- Do not compensate for the absence of colour by adding gradients or excessive shadows.
-- Maintain accessibility and readability in both themes.
+
+- Use genuine translucent glass materials.
+- Use background blur, transparency, depth and subtle light reflections.
+- Do not turn every element into glass.
+- Avoid generic flat glassmorphism.
+- Maintain accessibility and readability.
 
 **Final Design Principle:** Black + White + Neutral Grey only. No gradients. No additional colours. No exceptions.
+
 
 ### Rule 03: Responsive Typography & Device-Based Scaling
 
@@ -255,3 +274,71 @@ Whenever something is removed:
 - If a dependency is uncertain, investigate before deleting it.
 
 **Final Design Principle:** If functionality is removed, its obsolete implementation must be removed completely too. Keep the codebase clean, lean and free from dead code, unused files and abandoned logic.
+
+### Rule 07: Liquid Morphing Navigation & Tab Transitions
+
+Implement a premium, fluid, liquid-like morphing animation for all tab switches and navigation interactions.
+
+**Core Animation Behaviour:**
+
+When a user selects a different tab:
+
+1. The currently active glass indicator should smoothly compress slightly.
+2. It should stretch and flow horizontally toward the newly selected tab.
+3. During movement, it should temporarily change its width and shape, creating a liquid-like deformation.
+4. As it reaches the destination, it should smoothly expand and adapt to the exact dimensions of the newly selected tab.
+5. It should settle naturally into its final shape with a subtle spring-like motion.
+
+**Visual Requirements:**
+
+- The active selection must remain a translucent monochrome Liquid Glass surface.
+- The glass indicator should morph rather than simply slide.
+- Use smooth squircle geometry throughout the deformation.
+- Preserve the existing maximum corner-radius design.
+- Keep the glass blur, subtle reflections and edge highlights during movement.
+- Inactive tabs should remain visually clean and understated.
+- The transition must work in both Light Mode and Dark Mode.
+
+**Animation Characteristics:**
+
+- Initial compression: subtle and quick.
+- Movement: fluid stretching and directional deformation.
+- Arrival: smooth expansion into the destination dimensions.
+- Settling: gentle spring-like stabilization.
+- Suggested duration: 400–600ms.
+- Use custom spring physics or carefully designed cubic-bezier easing.
+- Avoid excessive bouncing or cartoon-like elastic movement.
+
+**Technical Implementation:**
+
+- Use Framer Motion or Motion for React if already available.
+- Use a shared animated layout indicator with `layoutId` where appropriate.
+- Use `AnimatePresence` only where content mounting and unmounting requires it.
+- Measure destination tab dimensions dynamically.
+- Support tabs with different widths.
+- Prevent animation flickering and layout jumps.
+- Preserve keyboard navigation and accessibility.
+- Respect `prefers-reduced-motion`.
+
+**Apply To:**
+
+- Bottom navigation.
+- Top navigation tabs.
+- Sidebar navigation.
+- Segmented controls.
+- Dashboard tab switches.
+- Any component with a moving active selection.
+
+**Important Restrictions:**
+
+- No ordinary underline animation.
+- No basic opacity-only transitions.
+- No abrupt sliding between tabs.
+- No independent competing animations.
+- Do not recreate the entire navigation component if the existing component can be extended.
+
+**Acceptance Criteria:**
+
+The active glass surface must visually behave like a flexible liquid material: compressing, stretching, flowing toward the selected tab, and naturally expanding to fit it.
+
+The result should feel like a premium Apple-inspired Liquid Glass interaction, not a conventional web navigation animation.
