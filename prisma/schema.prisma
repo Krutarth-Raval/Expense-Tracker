@@ -38,3 +38,4 @@ model AccountSummary {
   balance     Float    @default(0.0)
   updatedAt   DateTime @updatedAt
 }
+
