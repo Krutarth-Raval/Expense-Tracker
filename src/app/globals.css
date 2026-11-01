@@ -70,46 +70,35 @@
 
 :root {
   /* ==========================================================================
-     2. SEMANTIC DESIGN TOKENS - LIGHT THEME (Apple Crystalline Liquid Glass)
+     2. SEMANTIC DESIGN TOKENS - LIGHT THEME (Apple Crystalline Liquid Glass - Strict Monochrome)
      ========================================================================== */
-  --color-background: #f4f6fa;
-  --color-background-secondary: #ffffff;
-  --color-surface: rgba(255, 255, 255, 0.35);
-  --color-surface-elevated: rgba(255, 255, 255, 0.55);
+  --color-background: var(--pure-white);
+  --color-background-secondary: var(--neutral-100);
+  --color-surface: rgba(255, 255, 255, 0.45);
+  --color-surface-elevated: rgba(255, 255, 255, 0.65);
 
-  /* Fluid Optical Environment - Light Theme */
-  --liquid-water-base: #f4f6fa;
-  --liquid-wave-1: rgba(198, 222, 248, 0.55);   /* Cerulean crystalline fluid current */
-  --liquid-wave-2: rgba(248, 238, 228, 0.50);   /* Warm pearlescent alabaster current */
-  --liquid-wave-3: rgba(222, 232, 250, 0.45);   /* Crystalline oceanic mist */
-  --liquid-caustic: rgba(255, 255, 255, 0.85);  /* Surface light refraction caustic */
+  /* Fluid Optical Environment - Light Theme (Strict Monochrome) */
+  --liquid-water-base: var(--pure-white);
+  --liquid-caustic: rgba(255, 255, 255, 0.85);
   --liquid-sheen: rgba(255, 255, 255, 0.50);
-  /* Refined, restrained optical prism dispersion (non-neon) */
-  --liquid-diffract-1: rgba(190, 225, 248, 0.28);
-  --liquid-diffract-2: rgba(226, 218, 250, 0.22);
-  --liquid-diffract-3: rgba(250, 228, 236, 0.18);
 
   /* Hierarchical Glass Materials - Light Theme */
   /* Tier 1: Header - Thin, elegant translucent glass */
-  --glass-bg-header: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.46) 0%,
-    rgba(255, 255, 255, 0.18) 52%,
-    rgba(255, 255, 255, 0.32) 100%
-  );
+  --glass-bg-header: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.46) 0%,
+      rgba(255, 255, 255, 0.18) 52%,
+      rgba(255, 255, 255, 0.32) 100%);
   --glass-header-blur: 20px;
   --glass-header-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.95),
     inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.25),
-    0 4px 20px -2px rgba(18, 28, 48, 0.05);
+    0 4px 20px -2px rgba(0, 0, 0, 0.04);
 
   /* Tier 2: Main Cards - Deeper frosted liquid glass with rich refractive depth */
-  --glass-bg-card: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.52) 0%,
-    rgba(255, 255, 255, 0.24) 44%,
-    rgba(255, 255, 255, 0.38) 100%
-  );
+  --glass-bg-card: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.52) 0%,
+      rgba(255, 255, 255, 0.24) 44%,
+      rgba(255, 255, 255, 0.38) 100%);
   --glass-bg-card-subtle: rgba(255, 255, 255, 0.22);
   --glass-card-blur: 26px;
   --glass-card-shadow:
@@ -117,29 +106,25 @@
     inset 0 2px 4px 0 rgba(255, 255, 255, 0.35),
     inset 0 -1px 1px 0 rgba(0, 0, 0, 0.035),
     0 1px 3px 0 rgba(0, 0, 0, 0.02),
-    0 10px 32px -4px rgba(18, 28, 52, 0.06);
+    0 10px 32px -4px rgba(0, 0, 0, 0.05);
 
   /* Tier 3: Floating Navigation - Dimensional, reflective floating lens */
-  --glass-bg-nav: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.68) 0%,
-    rgba(255, 255, 255, 0.36) 50%,
-    rgba(255, 255, 255, 0.54) 100%
-  );
+  --glass-bg-nav: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.68) 0%,
+      rgba(255, 255, 255, 0.36) 50%,
+      rgba(255, 255, 255, 0.54) 100%);
   --glass-nav-blur: 32px;
   --glass-nav-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 1.0),
     inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.50),
     inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.04),
     0 4px 14px -2px rgba(0, 0, 0, 0.04),
-    0 20px 48px -8px rgba(12, 22, 46, 0.12);
+    0 20px 48px -8px rgba(0, 0, 0, 0.08);
 
   /* Tier 4: Small Controls & Badges - Compact glossy glass surfaces */
-  --glass-bg-control: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(255, 255, 255, 0.46) 100%
-  );
+  --glass-bg-control: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.46) 100%);
   --glass-control-blur: 24px;
   --glass-control-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 1.0),
@@ -180,40 +165,32 @@
   --calendar-block-4: var(--pure-black);
 
   /* Ambient Monochrome Background Tokens - Light Theme */
-  --ambient-orb-1: var(--liquid-wave-1);
-  --ambient-orb-2: var(--liquid-wave-2);
-  --ambient-orb-3: var(--liquid-caustic);
+  --ambient-orb-1: transparent;
+  --ambient-orb-2: transparent;
+  --ambient-orb-3: transparent;
 }
 
 /* ==========================================================================
-   3. SEMANTIC DESIGN TOKENS - DARK THEME (Apple Midnight Obsidian Liquid Glass)
+   3. SEMANTIC DESIGN TOKENS - DARK THEME (Apple Midnight Obsidian Liquid Glass - Strict Monochrome)
    ========================================================================== */
-.dark, [data-theme="dark"] {
-  --color-background: #080a0f;
-  --color-background-secondary: #0e1219;
+.dark,
+[data-theme="dark"] {
+  --color-background: var(--pure-black);
+  --color-background-secondary: var(--neutral-900);
   --color-surface: rgba(255, 255, 255, 0.035);
   --color-surface-elevated: rgba(255, 255, 255, 0.065);
 
-  /* Fluid Optical Environment - Dark Theme */
-  --liquid-water-base: #080a0f;
-  --liquid-wave-1: rgba(18, 32, 54, 0.55);   /* Midnight Prussian blue fluid pool */
-  --liquid-wave-2: rgba(14, 38, 48, 0.42);   /* Abyssal teal fluid wave */
-  --liquid-wave-3: rgba(28, 24, 46, 0.35);   /* Smoky obsidian amethyst haze */
-  --liquid-caustic: rgba(200, 225, 255, 0.12); /* Silver moonlight surface refraction */
-  --liquid-sheen: rgba(255, 255, 255, 0.06);
-  /* Controlled dark prismatic refraction (smoky silver-teal-indigo) */
-  --liquid-diffract-1: rgba(30, 70, 95, 0.22);
-  --liquid-diffract-2: rgba(58, 48, 92, 0.18);
-  --liquid-diffract-3: rgba(78, 62, 98, 0.14);
+  /* Fluid Optical Environment - Dark Theme (Strict Monochrome) */
+  --liquid-water-base: var(--pure-black);
+  --liquid-caustic: rgba(255, 255, 255, 0.08);
+  --liquid-sheen: rgba(255, 255, 255, 0.04);
 
   /* Hierarchical Glass Materials - Dark Theme */
   /* Tier 1: Header - Thin, elegant translucent obsidian glass */
-  --glass-bg-header: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.015) 55%,
-    rgba(255, 255, 255, 0.035) 100%
-  );
+  --glass-bg-header: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.015) 55%,
+      rgba(255, 255, 255, 0.035) 100%);
   --glass-header-blur: 22px;
   --glass-header-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.28),
@@ -221,12 +198,10 @@
     0 6px 24px -4px rgba(0, 0, 0, 0.70);
 
   /* Tier 2: Main Cards - Deeper frosted liquid glass with rich refractive depth */
-  --glass-bg-card: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 44%,
-    rgba(255, 255, 255, 0.045) 100%
-  );
+  --glass-bg-card: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 44%,
+      rgba(255, 255, 255, 0.045) 100%);
   --glass-bg-card-subtle: rgba(255, 255, 255, 0.025);
   --glass-card-blur: 28px;
   --glass-card-shadow:
@@ -237,12 +212,10 @@
     0 16px 44px -8px rgba(0, 0, 0, 0.88);
 
   /* Tier 3: Floating Navigation - Dimensional, reflective floating lens */
-  --glass-bg-nav: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(255, 255, 255, 0.035) 50%,
-    rgba(255, 255, 255, 0.07) 100%
-  );
+  --glass-bg-nav: linear-gradient(140deg,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.035) 50%,
+      rgba(255, 255, 255, 0.07) 100%);
   --glass-nav-blur: 32px;
   --glass-nav-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.48),
@@ -252,11 +225,9 @@
     0 24px 58px -10px rgba(0, 0, 0, 0.96);
 
   /* Tier 4: Small Controls & Badges - Compact glossy glass surfaces */
-  --glass-bg-control: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  --glass-bg-control: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.05) 100%);
   --glass-control-blur: 24px;
   --glass-control-shadow:
     inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.42),
@@ -297,8 +268,9 @@
   --calendar-block-4: var(--pure-white);
 
   /* Ambient Monochrome Background Tokens - Dark Theme */
-  --ambient-orb-1: var(--liquid-wave-1);
-  --ambient-orb-2: var(--liquid-wave-2);
+  --ambient-orb-1: transparent;
+  --ambient-orb-2: transparent;
+  --ambient-orb-3: transparent;
   --ambient-orb-3: var(--liquid-caustic);
 }
 
@@ -315,7 +287,7 @@
   --color-border: var(--color-border);
   --color-divider: var(--color-divider);
   --color-input: var(--input-background);
-  
+
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
@@ -500,7 +472,7 @@ body {
 }
 
 /* Tier 1: Header (Thin, Elegant Translucent Glass) */
-header > nav,
+header>nav,
 header .liquid-glass-header {
   background: var(--glass-bg-header);
   backdrop-filter: blur(var(--glass-header-blur)) saturate(180%) brightness(102%);
@@ -587,12 +559,10 @@ nav[aria-label="Bottom Navigation Bar"] .liquid-glass-nav,
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse 120% 75% at 50% -15%,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.05) 42%,
-    transparent 72%
-  );
+  background: radial-gradient(ellipse 120% 75% at 50% -15%,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.05) 42%,
+      transparent 72%);
   z-index: 0;
 }
 
@@ -602,12 +572,10 @@ nav[aria-label="Bottom Navigation Bar"] .liquid-glass-nav,
 [data-theme="dark"] .liquid-glass::before,
 [data-theme="dark"] .liquid-glass-nav::before,
 [data-theme="dark"] .liquid-glass-header::before {
-  background: radial-gradient(
-    ellipse 120% 75% at 50% -15%,
-    rgba(255, 255, 255, 0.11) 0%,
-    rgba(255, 255, 255, 0.02) 38%,
-    transparent 68%
-  );
+  background: radial-gradient(ellipse 120% 75% at 50% -15%,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.02) 38%,
+      transparent 68%);
 }
 
 /* Ensure form controls do not have double reflections */
@@ -618,11 +586,9 @@ textarea.liquid-glass::before {
 
 /* Active Bottom Bar Liquid Glass Pill: Raised convex glass lens appearance */
 .liquid-glass-active-pill {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(240, 244, 252, 0.82) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(245, 245, 245, 0.85) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-width: 1px !important;
@@ -639,11 +605,9 @@ textarea.liquid-glass::before {
 
 .dark .liquid-glass-active-pill,
 [data-theme="dark"] .liquid-glass-active-pill {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.08) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-width: 1px !important;
@@ -666,166 +630,6 @@ textarea.liquid-glass::before {
 }
 
 /* ==========================================================================
-   8. WATER-LIKE LIQUID ENVIRONMENT & REFRACTION ANIMATIONS
-   ========================================================================== */
-.water-current-1 {
-  background: radial-gradient(
-    ellipse 85% 75% at 30% 25%,
-    var(--liquid-wave-1) 0%,
-    var(--liquid-wave-2) 60%,
-    transparent 85%
-  );
-}
-
-.water-current-2 {
-  background: radial-gradient(
-    ellipse 80% 80% at 70% 75%,
-    var(--liquid-wave-2) 0%,
-    var(--liquid-wave-3) 55%,
-    transparent 85%
-  );
-}
-
-.water-current-3 {
-  background: radial-gradient(
-    ellipse 75% 65% at 40% 50%,
-    var(--liquid-wave-3) 0%,
-    var(--liquid-wave-1) 65%,
-    transparent 85%
-  );
-}
-
-/* Subtle, restrained optical prism dispersion (pure optical physics, non-neon) */
-.water-diffraction {
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    var(--liquid-diffract-1) 22%,
-    var(--liquid-diffract-2) 48%,
-    var(--liquid-diffract-3) 74%,
-    transparent 100%
-  );
-}
-
-/* Water surface light caustic refraction */
-.water-caustic {
-  background: radial-gradient(
-    ellipse 90% 60% at 50% 0%,
-    var(--liquid-caustic) 0%,
-    var(--liquid-sheen) 45%,
-    transparent 80%
-  );
-}
-
-/* Optical light distortion veil (subtle chromatic depth layer) */
-.water-optical-distortion {
-  background: radial-gradient(
-    ellipse 100% 70% at 50% 40%,
-    rgba(255, 255, 255, 0.15) 0%,
-    transparent 70%
-  );
-}
-
-.dark .water-optical-distortion,
-[data-theme="dark"] .water-optical-distortion {
-  background: radial-gradient(
-    ellipse 100% 70% at 50% 40%,
-    rgba(255, 255, 255, 0.03) 0%,
-    transparent 70%
-  );
-}
-
-@keyframes water-wave-1 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(35px, 40px, 0) scale(1.06) rotate(3deg);
-  }
-}
-
-@keyframes water-wave-2 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(-40px, -35px, 0) scale(1.05) rotate(-2.5deg);
-  }
-}
-
-@keyframes water-wave-3 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(25px, -20px, 0) scale(1.08);
-  }
-}
-
-@keyframes water-diffract {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1) rotate(-1.5deg);
-    opacity: 0.42;
-  }
-  50% {
-    transform: translate3d(30px, 25px, 0) scale(1.08) rotate(2deg);
-    opacity: 0.58;
-  }
-}
-
-@keyframes water-caustic {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.45;
-  }
-  50% {
-    transform: translate3d(0, 15px, 0) scale(1.04);
-    opacity: 0.65;
-  }
-}
-
-.animate-water-wave-1 {
-  animation: water-wave-1 28s ease-in-out infinite;
-  will-change: transform;
-}
-
-.animate-water-wave-2 {
-  animation: water-wave-2 32s ease-in-out infinite;
-  will-change: transform;
-}
-
-.animate-water-wave-3 {
-  animation: water-wave-3 24s ease-in-out infinite;
-  will-change: transform;
-}
-
-.animate-water-diffract {
-  animation: water-diffract 34s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-.animate-water-caustic {
-  animation: water-caustic 20s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-/* Backward compatibility ambient animations */
-.animate-ambient-drift-1 {
-  animation: water-wave-1 28s ease-in-out infinite;
-  will-change: transform;
-}
-
-.animate-ambient-drift-2 {
-  animation: water-wave-2 32s ease-in-out infinite;
-  will-change: transform;
-}
-
-.animate-ambient-pulse {
-  animation: water-caustic 20s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-/* ==========================================================================
    UPI SCANNER LASER ANIMATION
    ========================================================================== */
 @keyframes scan {
@@ -833,10 +637,12 @@ textarea.liquid-glass::before {
     top: 5%;
     opacity: 0.8;
   }
+
   50% {
     top: 92%;
     opacity: 1;
   }
+
   100% {
     top: 5%;
     opacity: 0.8;

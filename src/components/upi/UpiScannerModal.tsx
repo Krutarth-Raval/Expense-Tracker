@@ -140,33 +140,92 @@ export function UpiScannerModal({
     merchantUpi: "merchant@upi",
   });
 
-  // Stop all camera stream tracks
+  // Helper to toggle hardware flashlight/torch (WebRTC applyConstraints + Capacitor NativeTorch fallback)
+  const setHardwareTorch = useCallback(async (enabled: boolean, track?: MediaStreamTrack | null): Promise<boolean> => {
+    let success = false;
+    const targetTrack = track || streamRef.current?.getVideoTracks()[0];
+
+    // 1. WebRTC Track applyConstraints (runs on live rear camera stream)
+    if (targetTrack && facingMode === "environment") {
+      try {
+        await (targetTrack as MediaStreamTrack & {
+          applyConstraints: (c: unknown) => Promise<void>;
+        }).applyConstraints({
+          advanced: [{ torch: enabled } as unknown as Record<string, unknown>],
+        });
+        success = true;
+      } catch {
+        try {
+          await (targetTrack as MediaStreamTrack & {
+            applyConstraints: (c: unknown) => Promise<void>;
+          }).applyConstraints({
+            advanced: [{ fillLightMode: enabled ? "torch" : "off" } as unknown as Record<string, unknown>],
+          });
+          success = true;
+        } catch {
+          // Continue to native fallback
+        }
+      }
+    }
+
+    // 2. Native Capacitor Plugin fallback (Android APK)
+    if (!success && typeof window !== "undefined") {
+      try {
+        const { registerPlugin } = await import("@capacitor/core");
+        const nativeTorch = registerPlugin<{
+          setTorch: (options: { enabled: boolean }) => Promise<{ success: boolean }>;
+        }>("NativeTorch");
+        await nativeTorch.setTorch({ enabled });
+        success = true;
+      } catch (e) {
+        console.warn("Native torch invocation failed:", e);
+      }
+    }
+
+    return success;
+  }, [facingMode]);
+
+  // Stop all camera stream tracks cleanly
   const stopCameraTracks = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch (e) {
+          console.warn("Track stop error:", e);
+        }
+      });
       streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
   }, []);
 
-  // Request camera and torch permissions, attach live stream
+  // Request camera permissions, attach live stream with robust fallback chain
   const startCamera = useCallback(
-    async (mode: "environment" | "user" = facingMode) => {
+    async (mode: "environment" | "user") => {
       stopCameraTracks();
-      setIsRequesting(true);
-      setPermissionError(null);
+      queueMicrotask(() => {
+        setIsRequesting(true);
+        setPermissionError(null);
+      });
 
       if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
         setPermissionError("Camera API is not supported on this device.");
         setHasCamera(false);
-        setIsCameraActive(false);
         setIsRequesting(false);
         return;
       }
 
+      // Brief delay to allow mobile camera hardware sensor to release cleanly
+      await new Promise((res) => setTimeout(res, 80));
+
       try {
-        let stream: MediaStream;
+        let stream: MediaStream | null = null;
+
+        // Attempt 1: Standard ideal facingMode
         try {
-          // Attempt preferred facing mode first
           stream = await navigator.mediaDevices.getUserMedia({
             video: {
               facingMode: { ideal: mode },
@@ -176,26 +235,57 @@ export function UpiScannerModal({
             audio: false,
           });
         } catch {
-          // Fallback to general camera if exact mode constraint is rejected
-          stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false,
-          });
+          // Attempt 2: Direct facingMode string
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: mode },
+              audio: false,
+            });
+          } catch {
+            // Attempt 3: Match device by camera label
+            try {
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const videoInputs = devices.filter((d) => d.kind === "videoinput");
+              const target =
+                mode === "user"
+                  ? videoInputs.find((d) => /front|user|selfie/i.test(d.label))
+                  : videoInputs.find((d) => /back|rear|environment/i.test(d.label));
+
+              if (target?.deviceId) {
+                stream = await navigator.mediaDevices.getUserMedia({
+                  video: { deviceId: { exact: target.deviceId } },
+                  audio: false,
+                });
+              }
+            } catch {
+              // Ignore
+            }
+
+            // Attempt 4: General video stream fallback
+            if (!stream) {
+              stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false,
+              });
+            }
+          }
+        }
+
+        if (!stream) {
+          throw new Error("Could not acquire video stream");
         }
 
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.setAttribute("playsinline", "true");
-          await videoRef.current.play().catch(() => { });
+          await videoRef.current.play().catch(() => {});
         }
         setHasCamera(true);
-        setIsCameraActive(true);
         setPermissionError(null);
       } catch (err: unknown) {
         console.warn("Camera permission / access error:", err);
         setHasCamera(false);
-        setIsCameraActive(false);
         const name = (err as { name?: string })?.name;
         if (name === "NotAllowedError" || name === "PermissionDeniedError") {
           setPermissionError("Camera permission denied. Tap Enable to allow.");
@@ -208,66 +298,34 @@ export function UpiScannerModal({
         setIsRequesting(false);
       }
     },
-    [facingMode, stopCameraTracks]
+    [stopCameraTracks]
   );
 
-  // Initialize camera stream when modal opens or facingMode changes
+  // Single effect managing the active camera stream lifecycle (prevents duplicate collisions)
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !isCameraActive) {
       stopCameraTracks();
+      setHardwareTorch(false).catch(() => {});
       return;
     }
 
-    let isMounted = true;
+    let isCancelled = false;
 
-    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      return;
-    }
-
-    navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      })
-      .then((stream) => {
-        if (!isMounted) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute("playsinline", "true");
-          videoRef.current.play().catch(() => { });
-        }
-        setHasCamera(true);
-        setIsCameraActive(true);
-        setPermissionError(null);
-      })
-      .catch((err: unknown) => {
-        if (!isMounted) return;
-        console.warn("Camera permission / access error:", err);
-        setHasCamera(false);
-        setIsCameraActive(false);
-        const name = (err as { name?: string })?.name;
-        if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-          setPermissionError("Camera permission denied. Tap Enable to allow.");
-        } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-          setPermissionError("No camera found on this device.");
-        } else {
-          setPermissionError("Could not access camera. Tap Enable to retry.");
+    const timer = setTimeout(() => {
+      startCamera(facingMode).then(() => {
+        if (isCancelled) {
+          stopCameraTracks();
         }
       });
+    }, 0);
 
     return () => {
-      isMounted = false;
+      clearTimeout(timer);
+      isCancelled = true;
       stopCameraTracks();
+      setHardwareTorch(false).catch(() => {});
     };
-  }, [isOpen, facingMode, stopCameraTracks]);
+  }, [isOpen, isCameraActive, facingMode, startCamera, stopCameraTracks, setHardwareTorch]);
 
   // Live real-time QR code detection from video frames using optimized jsQR
   useEffect(() => {
@@ -298,50 +356,33 @@ export function UpiScannerModal({
   }, [isOpen, hasCamera, isCameraActive]);
 
   // Turn Camera On / Off
-  const handleToggleCamera = async () => {
+  const handleToggleCamera = () => {
     triggerHaptic("light");
-    if (isCameraActive && streamRef.current) {
-      stopCameraTracks();
-      setIsCameraActive(false);
-      setHasCamera(false);
-      setIsTorchOn(false);
-    } else {
-      await startCamera(facingMode);
-    }
+    setIsTorchOn(false);
+    setIsCameraActive((prev) => !prev);
   };
 
-  // Flip Camera (Rear <-> Front)
-  const handleFlipCamera = async () => {
+  // Flip Camera (Rear <-> Front) with clean state transition
+  const handleFlipCamera = () => {
     triggerHaptic("light");
-    const nextMode = facingMode === "environment" ? "user" : "environment";
-    setFacingMode(nextMode);
     setIsTorchOn(false);
-    await startCamera(nextMode);
+    setFacingMode((prev) => (prev === "environment" ? "user" : "environment"));
   };
 
   // Toggle Torch/Flashlight
   const handleToggleTorch = async () => {
     triggerHaptic("light");
-    if (!isCameraActive || !streamRef.current) {
-      // If camera is off, turn on rear camera first
+
+    if (facingMode !== "environment") {
+      // Front camera has no flash; switch to rear camera
       setFacingMode("environment");
-      await startCamera("environment");
+      return;
     }
 
-    const track = streamRef.current?.getVideoTracks()[0];
-    if (track) {
-      try {
-        const nextState = !isTorchOn;
-        await (track as MediaStreamTrack & {
-          applyConstraints: (c: unknown) => Promise<void>;
-        }).applyConstraints({
-          advanced: [{ torch: nextState }],
-        });
-        setIsTorchOn(nextState);
-      } catch (e) {
-        console.warn("Torch constraint error:", e);
-        setIsTorchOn((prev) => !prev);
-      }
+    const nextState = !isTorchOn;
+    const ok = await setHardwareTorch(nextState);
+    if (ok) {
+      setIsTorchOn(nextState);
     }
   };
 
@@ -377,6 +418,7 @@ export function UpiScannerModal({
     }
 
     stopCameraTracks();
+    setHardwareTorch(false).catch(() => {});
     setIsTorchOn(false);
     onProceedToPay({
       ...finalMerchant,
@@ -430,6 +472,8 @@ export function UpiScannerModal({
           type="button"
           onClick={() => {
             triggerHaptic("light");
+            setHardwareTorch(false).catch(() => {});
+            setIsTorchOn(false);
             onClose();
           }}
           aria-label="Close Scanner"
@@ -462,7 +506,10 @@ export function UpiScannerModal({
               <button
                 type="button"
                 disabled={isRequesting}
-                onClick={() => startCamera(facingMode)}
+                onClick={() => {
+                  setIsCameraActive(true);
+                  startCamera(facingMode);
+                }}
                 className="mt-1 px-4 py-2 rounded-full squircle-btn bg-white text-black font-semibold text-xs flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-lg disabled:opacity-50"
               >
                 <Camera size={14} />

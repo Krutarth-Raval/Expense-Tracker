@@ -17,7 +17,7 @@ export function SalarySetupModal({
 }: SalarySetupModalProps) {
   const { user, updateUserProfile } = useAuth();
   const [salaryDay, setSalaryDay] = useState<number>(() => {
-    return user?.salaryDay || 7;
+    return user?.salaryDay || 1;
   });
   const [salaryAmount, setSalaryAmount] = useState<string>(() => {
     return user?.salaryAmount ? String(user.salaryAmount) : "25000";

@@ -159,6 +159,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error("Failed to remove session:", e);
           }
           notifyAuthListeners();
+        } else if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.user) {
+            try {
+              const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+              const parsed = stored ? JSON.parse(stored) : {};
+              localStorage.setItem(
+                AUTH_STORAGE_KEY,
+                JSON.stringify({
+                  user: { ...parsed.user, ...data.user },
+                  savedAt: Date.now(),
+                })
+              );
+              notifyAuthListeners();
+            } catch (e) {
+              console.warn("Could not sync fresh user session:", e);
+            }
+          }
         }
       })
       .catch((err) => {

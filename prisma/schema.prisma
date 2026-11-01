@@ -12,7 +12,7 @@ model User {
   email               String   @unique
   password            String
   salaryDate          DateTime?
-  salaryDay           Int?      @default(7)
+  salaryDay           Int?      @default(1)
   salaryAmount        Float?
   salaryConfigured    Boolean   @default(false)
   salaryPromptedAt    DateTime?

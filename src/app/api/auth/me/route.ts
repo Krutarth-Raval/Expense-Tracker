@@ -42,7 +42,22 @@ export async function POST(req: Request) {
         ? user.salaryDay
         : user.salaryDate
         ? new Date(user.salaryDate).getUTCDate()
-        : null;
+        : 1;
+
+    const salaryConfigured = Boolean(
+      user.salaryConfigured ||
+      (user.salaryAmount !== null && user.salaryAmount !== undefined && user.salaryAmount > 0)
+    );
+
+    // Auto-heal legacy database rows where salaryAmount was saved before salaryConfigured was introduced
+    if (!user.salaryConfigured && user.salaryAmount && user.salaryAmount > 0) {
+      prisma.user
+        .update({
+          where: { id: user.id },
+          data: { salaryConfigured: true },
+        })
+        .catch(() => {});
+    }
 
     return NextResponse.json({
       success: true,
@@ -52,7 +67,7 @@ export async function POST(req: Request) {
         salaryDate: user.salaryDate,
         salaryDay,
         salaryAmount: user.salaryAmount,
-        salaryConfigured: user.salaryConfigured,
+        salaryConfigured,
         salaryPromptedAt: user.salaryPromptedAt,
         initialSavings: user.initialSavings,
         initialMonthBalance: user.initialMonthBalance,

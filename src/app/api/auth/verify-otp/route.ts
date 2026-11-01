@@ -55,15 +55,27 @@ export async function POST(req: Request) {
 
     console.log("User verified and saved to database successfully:", user.email);
 
+    const salaryDay =
+      user.salaryDay !== null && user.salaryDay !== undefined
+        ? user.salaryDay
+        : user.salaryDate
+        ? new Date(user.salaryDate).getUTCDate()
+        : 1;
+
+    const salaryConfigured = Boolean(
+      user.salaryConfigured ||
+      (user.salaryAmount !== null && user.salaryAmount !== undefined && user.salaryAmount > 0)
+    );
+
     return NextResponse.json({
       success: true,
       user: {
         id: user.id,
         email: user.email,
         salaryDate: user.salaryDate,
-        salaryDay: user.salaryDay,
+        salaryDay,
         salaryAmount: user.salaryAmount,
-        salaryConfigured: user.salaryConfigured,
+        salaryConfigured,
         salaryPromptedAt: user.salaryPromptedAt,
         initialSavings: user.initialSavings,
         initialMonthBalance: user.initialMonthBalance,

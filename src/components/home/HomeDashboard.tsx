@@ -33,7 +33,7 @@ export function HomeDashboard() {
   const [salaryDay, setSalaryDay] = useState<number>(() => {
     if (user?.salaryDay) return user.salaryDay;
     if (user?.salaryDate) return new Date(user.salaryDate).getUTCDate();
-    return 7;
+    return 1;
   });
 
   const [salaryAmount, setSalaryAmount] = useState<number>(() => {
@@ -50,11 +50,27 @@ export function HomeDashboard() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [scannedMerchant, setScannedMerchant] = useState<ScannedMerchant | null>(null);
 
-  // Salary setup modal state (pops up in a few seconds on Home)
+  // Salary setup modal state (pops up in a few seconds on Home only if not yet configured)
   const [isSalarySetupOpen, setIsSalarySetupOpen] = useState(false);
 
   useEffect(() => {
     if (!userEmail) return;
+
+    // Check if user has already configured salary in user object, DB, or localStorage
+    const isConfiguredLocally =
+      typeof window !== "undefined" &&
+      localStorage.getItem(`salary_configured_${userEmail}`) === "true";
+
+    const isAlreadyConfigured = Boolean(
+      user?.salaryConfigured ||
+      isConfiguredLocally ||
+      (typeof user?.salaryAmount === "number" && user.salaryAmount > 0)
+    );
+
+    // If user has already configured salary, NEVER show setup modal
+    if (isAlreadyConfigured) {
+      return;
+    }
 
     const sessionKey = `seen_salary_setup_${userEmail}`;
     const hasSeen = typeof window !== "undefined" ? sessionStorage.getItem(sessionKey) : "true";
@@ -66,7 +82,7 @@ export function HomeDashboard() {
 
       return () => clearTimeout(timer);
     }
-  }, [userEmail]);
+  }, [userEmail, user?.salaryConfigured, user?.salaryAmount]);
 
   // Sync fresh profile from DB on mount
   useEffect(() => {
@@ -82,7 +98,7 @@ export function HomeDashboard() {
             ? freshUser.salaryDay
             : freshUser.salaryDate
               ? new Date(freshUser.salaryDate).getUTCDate()
-              : 7;
+              : 1;
           setSalaryDay(freshDay);
 
           if (

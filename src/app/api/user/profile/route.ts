@@ -44,13 +44,29 @@ export async function GET(req: Request) {
         ? user.salaryDay
         : user.salaryDate
         ? new Date(user.salaryDate).getUTCDate()
-        : 7;
+        : 1;
+
+    const salaryConfigured = Boolean(
+      user.salaryConfigured ||
+      (user.salaryAmount !== null && user.salaryAmount !== undefined && user.salaryAmount > 0)
+    );
+
+    // Auto-heal legacy database rows where salaryAmount is set but salaryConfigured flag was false
+    if (!user.salaryConfigured && user.salaryAmount && user.salaryAmount > 0) {
+      prisma.user
+        .update({
+          where: { id: user.id },
+          data: { salaryConfigured: true },
+        })
+        .catch(() => {});
+    }
 
     return NextResponse.json({
       success: true,
       user: {
         ...user,
         salaryDay,
+        salaryConfigured,
       },
     });
   } catch (error) {
@@ -144,11 +160,13 @@ export async function POST(req: Request) {
       if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31) {
         updateData.salaryDay = dayNum;
         updateData.salaryDate = new Date(Date.UTC(2026, 0, dayNum, 12, 0, 0));
+        updateData.salaryConfigured = true;
       }
     } else if (salaryDate !== undefined) {
       updateData.salaryDate = salaryDate ? new Date(salaryDate) : null;
       if (updateData.salaryDate) {
         updateData.salaryDay = updateData.salaryDate.getUTCDate();
+        updateData.salaryConfigured = true;
       }
     }
 
@@ -219,7 +237,7 @@ export async function POST(req: Request) {
         ? updatedUser.salaryDay
         : updatedUser.salaryDate
         ? new Date(updatedUser.salaryDate).getUTCDate()
-        : 7;
+        : 1;
 
     return NextResponse.json({
       success: true,
