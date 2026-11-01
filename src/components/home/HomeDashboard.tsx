@@ -50,23 +50,57 @@ export function HomeDashboard() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [scannedMerchant, setScannedMerchant] = useState<ScannedMerchant | null>(null);
 
-  // Salary setup modal state (pops up in a few seconds on Home)
+  // Salary setup modal state (pops up once on signup, and every 24 hours if unconfigured)
   const [isSalarySetupOpen, setIsSalarySetupOpen] = useState(false);
 
   useEffect(() => {
     if (!userEmail) return;
 
-    const sessionKey = `seen_salary_setup_${userEmail}`;
-    const hasSeen = typeof window !== "undefined" ? sessionStorage.getItem(sessionKey) : "true";
-    if (!hasSeen) {
-      const timer = setTimeout(() => {
-        setIsSalarySetupOpen(true);
-        sessionStorage.setItem(sessionKey, "true");
-      }, 2500);
+    // 1. If salary is already configured, do not show it
+    const isSalaryConfigured =
+      user?.salaryConfigured === true ||
+      (typeof window !== "undefined" &&
+        localStorage.getItem(`salary_configured_${userEmail}`) === "true");
 
-      return () => clearTimeout(timer);
+    if (isSalaryConfigured) {
+      return;
     }
-  }, [userEmail]);
+
+    // 2. If not configured, ask only every 24 hours (or right after signup if never prompted)
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const localLastPrompt =
+      typeof window !== "undefined"
+        ? parseInt(localStorage.getItem(`salary_last_prompted_${userEmail}`) || "0", 10)
+        : 0;
+    const dbLastPrompt = user?.salaryPromptedAt
+      ? new Date(user.salaryPromptedAt).getTime()
+      : 0;
+    const lastPromptedTime = Math.max(localLastPrompt, dbLastPrompt);
+
+    const now = Date.now();
+    const shouldPrompt = !lastPromptedTime || now - lastPromptedTime >= ONE_DAY_MS;
+
+    if (!shouldPrompt) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setIsSalarySetupOpen(true);
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`salary_last_prompted_${userEmail}`, String(now));
+      }
+      fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          salaryPromptedAt: new Date(now).toISOString(),
+        }),
+      }).catch(() => {});
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [userEmail, user?.salaryConfigured, user?.salaryPromptedAt]);
 
   // Sync fresh profile from DB on mount
   useEffect(() => {
@@ -90,6 +124,9 @@ export function HomeDashboard() {
             !isNaN(freshUser.salaryAmount)
           ) {
             setSalaryAmount(freshUser.salaryAmount);
+          }
+          if (freshUser.salaryConfigured && typeof window !== "undefined") {
+            localStorage.setItem(`salary_configured_${userEmail}`, "true");
           }
           updateUserProfile(freshUser);
         }
@@ -229,13 +266,12 @@ export function HomeDashboard() {
     return `₹${absVal}`;
   };
 
-  // Helper to format month balance: "+ ₹200" or "- ₹50"
+  // Helper to format month balance: "₹200" or "- ₹50" (No plus sign)
   const formatMonthBalance = (val: number): string => {
     const absVal = Math.abs(val).toLocaleString("en-IN", {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     });
-    if (val > 0) return `+ ₹${absVal}`;
     if (val < 0) return `- ₹${absVal}`;
     return `₹${absVal}`;
   };
@@ -245,7 +281,6 @@ export function HomeDashboard() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     });
-    if (val > 0) return `+ ₹${absVal}`;
     if (val < 0) return `- ₹${absVal}`;
     return `₹${absVal}`;
   };
@@ -273,7 +308,7 @@ export function HomeDashboard() {
   return (
     <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 animate-in fade-in zoom-in-95 duration-200">
       {/* Top Row: Total Savings (Same layout as other 2 tiles: title at top left, amount at bottom in bigger font) */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+      <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
         {/* Top Left: Title + Percentage side-by-side */}
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
@@ -282,7 +317,7 @@ export function HomeDashboard() {
             </span>
 
             <span
-              className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold border bg-surface-elevated text-text-muted border-border"
+              className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold border bg-surface-elevated text-text-muted border-white/20 dark:border-white/10"
             >
               {formattedPercentage}%
             </span>
@@ -303,7 +338,7 @@ export function HomeDashboard() {
       {/* Side-by-side tiles: Month Balance & Money Spent */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
         {/* Tile 1: Month Balance */}
-        <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+        <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
           {/* Top Left: Title */}
           <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
             Month Balance
@@ -316,7 +351,7 @@ export function HomeDashboard() {
         </div>
 
         {/* Tile 2: Money Spent */}
-        <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+        <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
           {/* Top Left: Title */}
           <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
             Money Spent
@@ -333,7 +368,7 @@ export function HomeDashboard() {
       <ExpensesCalendar dailyExpenses={dailyExpensesMap} />
 
       {/* Transaction History Section (Recent transactions for the actual current calendar month) */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col gap-3.5 sm:gap-4">
+      <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col gap-3.5 sm:gap-4">
         <div className="flex items-center justify-between">
           <span className="text-sm sm:text-base font-semibold text-text-primary">
             Transaction History

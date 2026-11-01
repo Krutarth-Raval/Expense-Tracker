@@ -188,7 +188,7 @@ export function CalendarExpensesView() {
       {activeMonths.map((m) => (
         <div
           key={m.key}
-          className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]"
+          className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]"
         >
           {/* Top Row: Month Name on Top Left, Download Button on Top Right */}
           <div className="flex items-center justify-between w-full">
@@ -200,7 +200,7 @@ export function CalendarExpensesView() {
               type="button"
               onClick={() => downloadMonthPdf(m)}
               aria-label={`Download ${m.monthName} PDF`}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full squircle-btn liquid-glass border border-border flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer shadow-sm"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full squircle-btn liquid-glass flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer"
             >
               <Download size={16} />
             </button>

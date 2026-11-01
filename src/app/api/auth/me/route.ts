@@ -18,7 +18,13 @@ export async function POST(req: Request) {
         id: true,
         email: true,
         salaryDate: true,
+        salaryDay: true,
         salaryAmount: true,
+        salaryConfigured: true,
+        salaryPromptedAt: true,
+        initialSavings: true,
+        initialMonthBalance: true,
+        onboardingCompleted: true,
         defaultPaymentApp: true,
         createdAt: true,
       },
@@ -31,9 +37,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const salaryDay = user.salaryDate
-      ? new Date(user.salaryDate).getUTCDate()
-      : null;
+    const salaryDay =
+      user.salaryDay !== null && user.salaryDay !== undefined
+        ? user.salaryDay
+        : user.salaryDate
+        ? new Date(user.salaryDate).getUTCDate()
+        : null;
 
     return NextResponse.json({
       success: true,
@@ -43,6 +52,11 @@ export async function POST(req: Request) {
         salaryDate: user.salaryDate,
         salaryDay,
         salaryAmount: user.salaryAmount,
+        salaryConfigured: user.salaryConfigured,
+        salaryPromptedAt: user.salaryPromptedAt,
+        initialSavings: user.initialSavings,
+        initialMonthBalance: user.initialMonthBalance,
+        onboardingCompleted: user.onboardingCompleted,
         defaultPaymentApp: user.defaultPaymentApp,
       },
     });

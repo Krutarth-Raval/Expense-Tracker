@@ -12,9 +12,11 @@ model User {
   email               String   @unique
   password            String
   salaryDate          DateTime?
-  salaryDay           Int?     @default(7)
+  salaryDay           Int?      @default(7)
   salaryAmount        Float?
-  initialSavings      Float?   @default(0)
+  salaryConfigured    Boolean   @default(false)
+  salaryPromptedAt    DateTime?
+  initialSavings      Float?    @default(0)
   initialMonthBalance Float?   @default(0)
   onboardingCompleted Boolean  @default(false)
   defaultPaymentApp   String?

@@ -22,11 +22,16 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     e.preventDefault();
     if (!user?.email) return;
 
-    const numSavings = savings.trim() === "" ? 0 : parseFloat(savings);
-    const numBalance = monthBalance.trim() === "" ? 0 : parseFloat(monthBalance);
+    if (savings.trim() === "" || monthBalance.trim() === "") {
+      setError("Both Current Savings and Month Balance are compulsory to fill up");
+      return;
+    }
 
-    if (isNaN(numSavings) || isNaN(numBalance)) {
-      setError("Please enter valid numbers");
+    const numSavings = parseFloat(savings);
+    const numBalance = parseFloat(monthBalance);
+
+    if (isNaN(numSavings) || isNaN(numBalance) || numSavings < 0 || numBalance < 0) {
+      setError("Please enter valid amounts (0 or greater)");
       return;
     }
 

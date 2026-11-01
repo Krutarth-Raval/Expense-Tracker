@@ -130,7 +130,7 @@ export function ExpensesCalendar({ dailyExpenses = {} }: ExpensesCalendarProps) 
   const selectedAmount = dailyExpenses[selectedDate] || 0;
 
   return (
-    <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col gap-3.5 sm:gap-4">
+    <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col gap-3.5 sm:gap-4">
       {/* 1. Section Title */}
       <div className="flex items-center justify-between">
         <span className="text-sm sm:text-base font-semibold text-text-primary">

@@ -200,11 +200,11 @@ export function BottomBar({
         <div className="pointer-events-auto w-full max-w-[340px] sm:max-w-[400px] md:max-w-[440px] flex items-center justify-center gap-2.5 sm:gap-3.5 relative">
           {/* Main Navigation Capsule */}
           <div
-            className="relative flex-1 h-14 sm:h-16 p-1.5 rounded-full squircle-nav liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 flex items-center shadow-2xl transition-all duration-200"
+            className="relative flex-1 h-14 sm:h-16 p-1.5 rounded-full squircle-nav liquid-glass-bottom-bar flex items-center transition-all duration-200"
           >
             {/* Single Shared Animated Glass Indicator: Zoom, Travel, and Settle */}
             <motion.div
-              className="absolute top-1.5 bottom-1.5 rounded-full liquid-glass-active-pill border border-black/15 dark:border-white/30 shadow-lg pointer-events-none"
+              className="absolute top-1.5 bottom-1.5 rounded-full liquid-glass-active-pill pointer-events-none"
               style={{
                 left: "6px",
                 width: "calc((100% - 12px) / 3)",
@@ -301,7 +301,7 @@ export function BottomBar({
                   onClick={handleQrButton}
                   onMouseEnter={() => qrIconRef.current?.startAnimation()}
                   aria-label="Scan QR Code"
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full squircle-control liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 flex items-center justify-center cursor-pointer select-none shadow-2xl active:scale-90 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 zoom-in-90 ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full squircle-control liquid-glass-elevated flex items-center justify-center cursor-pointer select-none active:scale-90 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 zoom-in-90 ${
                     selectedAction === "qr"
                       ? "liquid-glass-active-pill text-text-primary"
                       : "text-text-primary hover:bg-surface-elevated"
@@ -321,7 +321,7 @@ export function BottomBar({
                   onClick={handlePlusButton}
                   onMouseEnter={() => actionPlusIconRef.current?.startAnimation()}
                   aria-label="Add Transaction"
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full squircle-control liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 flex items-center justify-center cursor-pointer select-none shadow-2xl active:scale-90 transition-all duration-200 animate-in fade-in slide-in-from-bottom-1 zoom-in-90 ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full squircle-control liquid-glass-elevated flex items-center justify-center cursor-pointer select-none active:scale-90 transition-all duration-200 animate-in fade-in slide-in-from-bottom-1 zoom-in-90 ${
                     selectedAction === "plus"
                       ? "liquid-glass-active-pill text-text-primary"
                       : "text-text-primary hover:bg-surface-elevated"
@@ -343,9 +343,9 @@ export function BottomBar({
               onMouseEnter={() => mainPlusIconRef.current?.startAnimation()}
               aria-label={isActionOpen ? "Close Quick Actions" : "Open Quick Actions"}
               aria-expanded={isActionOpen}
-              className={`h-15 w-15 sm:h-16 sm:w-16 rounded-full squircle-control liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 flex items-center justify-center cursor-pointer select-none shadow-2xl active:scale-95 transition-all duration-200 ${
+              className={`h-15 w-15 sm:h-16 sm:w-16 rounded-full squircle-control liquid-glass-elevated flex items-center justify-center cursor-pointer select-none active:scale-95 transition-all duration-200 ${
                 isActionOpen
-                  ? "liquid-glass-active-pill text-text-primary border-white/30 dark:border-white/40"
+                  ? "liquid-glass-active-pill text-text-primary"
                   : "text-text-primary hover:bg-surface-elevated"
               }`}
             >

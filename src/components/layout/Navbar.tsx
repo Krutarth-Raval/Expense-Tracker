@@ -13,7 +13,7 @@ export function Navbar() {
     <header className="sticky top-2 sm:top-4 z-40 w-full flex justify-center pointer-events-none px-2 sm:px-4">
       <nav
         aria-label="Main Navigation"
-        className="pointer-events-auto w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto squircle-nav rounded-full liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 flex items-center justify-between transition-all duration-200"
+        className="pointer-events-auto w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto squircle-nav rounded-full liquid-glass-nav flex items-center justify-between transition-all duration-200"
         style={{ padding: "var(--navbar-pad)" }}
       >
         {/* Left: Logo Only */}

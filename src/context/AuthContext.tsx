@@ -18,6 +18,8 @@ export interface AuthUser {
   salaryDate?: string | Date | null;
   salaryDay?: number | null;
   salaryAmount?: number | null;
+  salaryConfigured?: boolean | null;
+  salaryPromptedAt?: string | Date | null;
   initialSavings?: number | null;
   initialMonthBalance?: number | null;
   onboardingCompleted?: boolean | null;

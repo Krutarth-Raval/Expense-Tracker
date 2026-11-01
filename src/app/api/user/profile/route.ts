@@ -22,6 +22,8 @@ export async function GET(req: Request) {
         salaryDate: true,
         salaryDay: true,
         salaryAmount: true,
+        salaryConfigured: true,
+        salaryPromptedAt: true,
         initialSavings: true,
         initialMonthBalance: true,
         onboardingCompleted: true,
@@ -68,6 +70,8 @@ export async function POST(req: Request) {
       salaryDay,
       salaryDate,
       salaryAmount,
+      salaryConfigured,
+      salaryPromptedAt,
       initialSavings,
       initialMonthBalance,
       onboardingCompleted,
@@ -88,11 +92,52 @@ export async function POST(req: Request) {
       salaryDate?: Date | null;
       salaryDay?: number | null;
       salaryAmount?: number | null;
+      salaryConfigured?: boolean;
+      salaryPromptedAt?: Date | null;
       initialSavings?: number | null;
       initialMonthBalance?: number | null;
       onboardingCompleted?: boolean;
       defaultPaymentApp?: string | null;
     } = {};
+
+    // Compulsory check when completing initial onboarding
+    if (onboardingCompleted) {
+      if (
+        initialSavings === undefined ||
+        initialSavings === null ||
+        initialSavings === "" ||
+        isNaN(Number(initialSavings)) ||
+        Number(initialSavings) < 0
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Current savings is compulsory and must be 0 or greater",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (
+        initialMonthBalance === undefined ||
+        initialMonthBalance === null ||
+        initialMonthBalance === "" ||
+        isNaN(Number(initialMonthBalance)) ||
+        Number(initialMonthBalance) < 0
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Current month balance is compulsory and must be 0 or greater",
+          },
+          { status: 400 }
+        );
+      }
+
+      updateData.initialSavings = parseFloat(String(initialSavings));
+      updateData.initialMonthBalance = parseFloat(String(initialMonthBalance));
+      updateData.onboardingCompleted = true;
+    }
 
     if (salaryDay !== undefined) {
       const dayNum = parseInt(String(salaryDay), 10);
@@ -108,27 +153,41 @@ export async function POST(req: Request) {
     }
 
     if (salaryAmount !== undefined) {
-      updateData.salaryAmount =
+      const numAmount =
         salaryAmount !== null && salaryAmount !== ""
           ? parseFloat(String(salaryAmount))
           : null;
+      updateData.salaryAmount = numAmount;
+      if (numAmount !== null && !isNaN(numAmount) && numAmount > 0) {
+        updateData.salaryConfigured = true;
+      }
     }
 
-    if (initialSavings !== undefined) {
+    if (salaryConfigured !== undefined) {
+      updateData.salaryConfigured = Boolean(salaryConfigured);
+    }
+
+    if (salaryPromptedAt !== undefined) {
+      updateData.salaryPromptedAt = salaryPromptedAt
+        ? new Date(salaryPromptedAt)
+        : new Date();
+    }
+
+    if (initialSavings !== undefined && !onboardingCompleted) {
       updateData.initialSavings =
         initialSavings !== null && initialSavings !== ""
           ? parseFloat(String(initialSavings))
           : 0;
     }
 
-    if (initialMonthBalance !== undefined) {
+    if (initialMonthBalance !== undefined && !onboardingCompleted) {
       updateData.initialMonthBalance =
         initialMonthBalance !== null && initialMonthBalance !== ""
           ? parseFloat(String(initialMonthBalance))
           : 0;
     }
 
-    if (onboardingCompleted !== undefined) {
+    if (onboardingCompleted !== undefined && !updateData.onboardingCompleted) {
       updateData.onboardingCompleted = Boolean(onboardingCompleted);
     }
 
@@ -145,6 +204,8 @@ export async function POST(req: Request) {
         salaryDate: true,
         salaryDay: true,
         salaryAmount: true,
+        salaryConfigured: true,
+        salaryPromptedAt: true,
         initialSavings: true,
         initialMonthBalance: true,
         onboardingCompleted: true,

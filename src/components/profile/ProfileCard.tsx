@@ -163,7 +163,12 @@ export function ProfileCard() {
       updateUserProfile({
         salaryDay: draftSalaryDay,
         salaryAmount: numericAmount,
+        salaryConfigured: true,
       });
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`salary_configured_${userEmail}`, "true");
+      }
 
       // Exit edit mode back to view mode
       setIsEditingSalary(false);

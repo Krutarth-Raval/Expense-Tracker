@@ -43,6 +43,8 @@ export async function POST(req: Request) {
         salaryDate: user.salaryDate,
         salaryDay: user.salaryDay,
         salaryAmount: user.salaryAmount,
+        salaryConfigured: user.salaryConfigured,
+        salaryPromptedAt: user.salaryPromptedAt,
         initialSavings: user.initialSavings,
         initialMonthBalance: user.initialMonthBalance,
         onboardingCompleted: user.onboardingCompleted,

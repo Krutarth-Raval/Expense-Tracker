@@ -48,6 +48,7 @@ export function SalarySetupModal({
           email: user.email,
           salaryDay,
           salaryAmount: numAmount,
+          salaryConfigured: true,
         }),
       });
 
@@ -61,7 +62,13 @@ export function SalarySetupModal({
       updateUserProfile({
         salaryDay,
         salaryAmount: numAmount,
+        salaryConfigured: true,
       });
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`salary_configured_${user.email}`, "true");
+        localStorage.removeItem(`salary_last_prompted_${user.email}`);
+      }
 
       setIsSubmitting(false);
       onSuccess?.();
@@ -71,6 +78,25 @@ export function SalarySetupModal({
       setError("Network error. Please try again.");
       setIsSubmitting(false);
     }
+  };
+
+  const handleDismiss = () => {
+    if (user?.email && typeof window !== "undefined") {
+      const now = Date.now();
+      localStorage.setItem(`salary_last_prompted_${user.email}`, String(now));
+      updateUserProfile({
+        salaryPromptedAt: new Date(now),
+      });
+      fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          salaryPromptedAt: new Date(now).toISOString(),
+        }),
+      }).catch(() => {});
+    }
+    onClose();
   };
 
   return (
@@ -83,7 +109,7 @@ export function SalarySetupModal({
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleDismiss}
             aria-label="Close"
             className="w-8 h-8 rounded-full squircle-btn liquid-glass border border-border flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer"
           >
@@ -160,7 +186,7 @@ export function SalarySetupModal({
           <div className="flex items-center gap-2.5 pt-1">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleDismiss}
               className="h-11 px-4 rounded-full squircle-btn liquid-glass border border-border text-xs sm:text-sm font-medium text-text-muted hover:text-text-primary active:scale-95 transition-all cursor-pointer select-none"
             >
               Later

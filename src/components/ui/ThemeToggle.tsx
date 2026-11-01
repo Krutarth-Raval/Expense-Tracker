@@ -70,7 +70,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <div
-        className="rounded-full liquid-glass border border-black/15 dark:border-white/25 opacity-50 flex-shrink-0"
+        className="rounded-full liquid-glass opacity-50 flex-shrink-0"
         style={{
           width: "calc(var(--toggle-btn-size) * 2 + var(--toggle-gap) + var(--toggle-pad) * 2)",
           height: "calc(var(--toggle-btn-size) + var(--toggle-pad) * 2)",
@@ -84,7 +84,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Theme selection"
-      className="relative flex items-center rounded-full squircle-nav liquid-glass liquid-glass-rim border border-black/15 dark:border-white/25 shadow-lg select-none flex-shrink-0"
+      className="relative flex items-center rounded-full squircle-nav liquid-glass select-none flex-shrink-0"
       style={{
         padding: "var(--toggle-pad)",
         gap: "var(--toggle-gap)",
@@ -92,7 +92,7 @@ export function ThemeToggle() {
     >
       {/* Single Shared Animated Glass Indicator: Zoom, Travel & Settle */}
       <motion.div
-        className="absolute rounded-full liquid-glass-active-pill border border-black/15 dark:border-white/30 shadow-md pointer-events-none"
+        className="absolute rounded-full liquid-glass-active-pill pointer-events-none"
         style={{
           top: "var(--toggle-pad)",
           bottom: "var(--toggle-pad)",
