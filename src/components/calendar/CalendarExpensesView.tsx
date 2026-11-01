@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Download } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useAuth } from "@/context/AuthContext";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface TransactionItem {
   id: string;
@@ -101,6 +102,7 @@ export function CalendarExpensesView() {
 
   // Generate and download PDF for the selected month
   const downloadMonthPdf = (monthData: MonthSpentData) => {
+    triggerHaptic("medium");
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -184,11 +186,11 @@ export function CalendarExpensesView() {
 
   // Only show the month cards, nothing else
   return (
-    <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 animate-in fade-in duration-200">
+    <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 pb-10 animate-in fade-in duration-200">
       {activeMonths.map((m) => (
         <div
           key={m.key}
-          className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]"
+          className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]"
         >
           {/* Top Row: Month Name on Top Left, Download Button on Top Right */}
           <div className="flex items-center justify-between w-full">
@@ -200,7 +202,7 @@ export function CalendarExpensesView() {
               type="button"
               onClick={() => downloadMonthPdf(m)}
               aria-label={`Download ${m.monthName} PDF`}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full squircle-btn liquid-glass flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full squircle-btn liquid-glass border border-border flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer shadow-sm"
             >
               <Download size={16} />
             </button>

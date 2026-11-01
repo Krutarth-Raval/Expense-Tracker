@@ -4,6 +4,7 @@ import React, { useSyncExternalStore, useRef, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useTheme } from "@/context/ThemeContext";
+import { triggerHaptic } from "@/lib/haptics";
 
 const subscribe = () => () => {};
 
@@ -70,10 +71,10 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <div
-        className="rounded-full liquid-glass opacity-50 flex-shrink-0"
+        className="rounded-full liquid-glass-nav opacity-50 flex-shrink-0"
         style={{
-          width: "calc(var(--toggle-btn-size) * 2 + var(--toggle-gap) + var(--toggle-pad) * 2)",
-          height: "calc(var(--toggle-btn-size) + var(--toggle-pad) * 2)",
+          width: "calc(var(--toggle-btn-width) * 2 + var(--toggle-gap) + var(--toggle-pad) * 2)",
+          height: "calc(var(--toggle-btn-height) + var(--toggle-pad) * 2)",
         }}
         aria-hidden="true"
       />
@@ -84,7 +85,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Theme selection"
-      className="relative flex items-center rounded-full squircle-nav liquid-glass select-none flex-shrink-0"
+      className="relative flex items-center rounded-full squircle-nav liquid-glass-nav shadow-lg select-none flex-shrink-0"
       style={{
         padding: "var(--toggle-pad)",
         gap: "var(--toggle-gap)",
@@ -92,13 +93,13 @@ export function ThemeToggle() {
     >
       {/* Single Shared Animated Glass Indicator: Zoom, Travel & Settle */}
       <motion.div
-        className="absolute rounded-full liquid-glass-active-pill pointer-events-none"
+        className="absolute rounded-full liquid-glass-active-pill shadow-md pointer-events-none"
         style={{
           top: "var(--toggle-pad)",
           bottom: "var(--toggle-pad)",
           left: "var(--toggle-pad)",
-          width: "var(--toggle-btn-size)",
-          height: "var(--toggle-btn-size)",
+          width: "var(--toggle-btn-width)",
+          height: "var(--toggle-btn-height)",
         }}
         animate={indicatorControls}
       />
@@ -109,15 +110,18 @@ export function ThemeToggle() {
         role="radio"
         aria-checked={!isDark}
         aria-label="Switch to light theme"
-        onClick={() => setTheme("light")}
+        onClick={() => {
+          triggerHaptic("light");
+          setTheme("light");
+        }}
         className="relative z-10 rounded-full squircle-btn flex items-center justify-center cursor-pointer focus:outline-none"
         style={{
-          width: "var(--toggle-btn-size)",
-          height: "var(--toggle-btn-size)",
+          width: "var(--toggle-btn-width)",
+          height: "var(--toggle-btn-height)",
         }}
       >
         <Sun
-          className={`relative z-20 w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors duration-200 ${
+          className={`relative z-20 w-4.5 h-4.5 sm:w-5 sm:h-5 transition-colors duration-200 ${
             !isDark
               ? "text-text-primary"
               : "text-text-muted hover:text-text-secondary"
@@ -132,15 +136,18 @@ export function ThemeToggle() {
         role="radio"
         aria-checked={isDark}
         aria-label="Switch to dark theme"
-        onClick={() => setTheme("dark")}
+        onClick={() => {
+          triggerHaptic("light");
+          setTheme("dark");
+        }}
         className="relative z-10 rounded-full squircle-btn flex items-center justify-center cursor-pointer focus:outline-none"
         style={{
-          width: "var(--toggle-btn-size)",
-          height: "var(--toggle-btn-size)",
+          width: "var(--toggle-btn-width)",
+          height: "var(--toggle-btn-height)",
         }}
       >
         <Moon
-          className={`relative z-20 w-4 h-4 sm:w-4.5 sm:h-4.5 transition-colors duration-200 ${
+          className={`relative z-20 w-4.5 h-4.5 sm:w-5 sm:h-5 transition-colors duration-200 ${
             isDark
               ? "text-text-primary"
               : "text-text-muted hover:text-text-secondary"

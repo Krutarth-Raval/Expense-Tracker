@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 import {
   UserRoundIcon,
   LogOut,
@@ -10,14 +16,40 @@ import {
   Check,
   Pencil,
   Download,
+  Smartphone,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useUpdate } from "@/context/UpdateContext";
+import { APP_VERSION_LABEL } from "@/lib/version";
 import { DayWheelPicker } from "./DayWheelPicker";
 import { PaymentAppModal } from "./PaymentAppModal";
 import { PaymentAppIcon, DEFAULT_PAYMENT_APPS } from "./PaymentAppIcons";
+import { Capacitor } from "@capacitor/core";
+
+// Application mode detection store (React 19 compliant, SSR-safe)
+function subscribeAppMode() {
+  return () => { };
+}
+
+function getAppModeSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  const isCapacitorNative =
+    Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "web";
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    Boolean((window.navigator as unknown as { standalone?: boolean }).standalone) ||
+    document.referrer.includes("android-app://");
+  return Boolean(isCapacitorNative || isStandalone);
+}
+
+function getAppModeServerSnapshot(): boolean {
+  return false;
+}
 
 export function ProfileCard() {
   const { user, logout, updateUserProfile } = useAuth();
+  const { updateInfo, checkForUpdates, openUpdateModal, isChecking } = useUpdate();
   const userEmail = user?.email;
 
   // Saved states
@@ -48,6 +80,13 @@ export function ProfileCard() {
   const [salarySaveSuccess, setSalarySaveSuccess] = useState(false);
   const [salaryError, setSalaryError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Application mode detection: true if running inside native Android/iOS app or standalone PWA
+  const isAppMode = useSyncExternalStore(
+    subscribeAppMode,
+    getAppModeSnapshot,
+    getAppModeServerSnapshot
+  );
 
   // Helper for ordinal suffix: 1st, 2nd, 3rd...
   const formatDay = (d: number) => {
@@ -90,8 +129,8 @@ export function ProfileCard() {
           const freshDay = freshUser.salaryDay
             ? freshUser.salaryDay
             : freshUser.salaryDate
-            ? new Date(freshUser.salaryDate).getUTCDate()
-            : 1;
+              ? new Date(freshUser.salaryDate).getUTCDate()
+              : 1;
 
           setSalaryDay(freshDay);
           setDraftSalaryDay(freshDay);
@@ -220,11 +259,11 @@ export function ProfileCard() {
   );
 
   return (
-    <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 animate-in fade-in zoom-in-95 duration-200">
+    <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 pb-10 animate-in fade-in zoom-in-95 duration-200">
       {/* =========================================================================
           SECTION 1: USER DETAILS (Avatar on left, Email on right, Sign Out below email)
           ========================================================================= */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-black/15 dark:border-white/20 p-4 sm:p-5 shadow-xl">
+      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl">
         <div className="flex items-center gap-3.5 sm:gap-4">
           {/* Avatar on Left */}
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full squircle-control liquid-glass border border-black/15 dark:border-white/25 flex items-center justify-center text-text-primary flex-shrink-0 shadow-sm">
@@ -259,7 +298,7 @@ export function ProfileCard() {
           - View Mode: Shows date & amount directly with "Edit" button
           - Edit Mode: Shows vertical 3-date drum wheel & input field with "Save" / "Cancel"
           ========================================================================= */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-black/15 dark:border-white/20 p-4 sm:p-5 shadow-xl flex flex-col gap-3.5">
+      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col gap-3.5">
         {/* Row 1: Salary Date (Icon + Title on Left, Date on Right in SAME row) */}
         <div className="flex items-center justify-between gap-3 min-h-[44px]">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
@@ -391,7 +430,7 @@ export function ProfileCard() {
       {/* =========================================================================
           SECTION 3: DEFAULT PAYMENT APP (Icon + Title on Left, "Select" on Right in SAME row)
           ========================================================================= */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-black/15 dark:border-white/20 p-4 sm:p-5 shadow-xl">
+      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl">
         <div className="flex items-center justify-between gap-2.5 sm:gap-3">
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
@@ -439,41 +478,98 @@ export function ProfileCard() {
       </div>
 
       {/* =========================================================================
-          SECTION 4: DOWNLOAD APPLICATION (GitHub Release Install Option)
+          SECTION 4: APPLICATION & VERSION CARD
+          - When in Web Mode: Shows "Download Application" with version and Install button
+          - When in App Mode: Shows "Application Version" title with its version on the right
           ========================================================================= */}
-      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-black/15 dark:border-white/20 p-4 sm:p-5 shadow-xl">
-        <div className="flex items-center justify-between gap-2.5 sm:gap-3">
-          {/* Left: Icon + Title & Subtitle */}
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl squircle-icon-sm liquid-glass border border-black/12 dark:border-white/18 flex items-center justify-center text-text-primary flex-shrink-0">
-              <Download size={18} />
+      <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl">
+        {isAppMode ? (
+          /* Installed Application Mode View */
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+            {/* Left: Icon + Title & Subtitle */}
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl squircle-icon-sm liquid-glass border border-black/12 dark:border-white/18 flex items-center justify-center text-text-primary flex-shrink-0">
+                <Smartphone size={18} />
+              </div>
+
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs xs:text-sm sm:text-base font-semibold text-text-primary truncate">
+                  Application Version
+                </span>
+                <span className="text-[11px] sm:text-xs text-text-muted truncate flex items-center gap-1.5">
+                  {updateInfo?.hasUpdate ? (
+                    <span className="text-amber-500 dark:text-amber-400 font-medium flex items-center gap-1">
+                      <Sparkles size={11} /> Update available
+                    </span>
+                  ) : (
+                    <span className="text-emerald-500 dark:text-emerald-400 font-medium flex items-center gap-1">
+                      <Check size={11} strokeWidth={2.5} /> Up to date
+                    </span>
+                  )}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs xs:text-sm sm:text-base font-semibold text-text-primary truncate">
-                Download Application
-              </span>
-              <span className="text-[11px] sm:text-xs text-text-muted truncate">
-                Latest GitHub Release
-              </span>
+            {/* Right: Version on the right, or Update button if new update available */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {updateInfo?.hasUpdate ? (
+                <button
+                  type="button"
+                  onClick={openUpdateModal}
+                  aria-label="New update available. Click to install."
+                  className="h-8 sm:h-9 px-3 sm:px-3.5 rounded-full squircle-btn bg-text-primary text-background font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-md select-none"
+                >
+                  <Download size={13} strokeWidth={2.2} />
+                  <span>Update</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => checkForUpdates(true)}
+                  disabled={isChecking}
+                  aria-label={`Current version ${APP_VERSION_LABEL}. Tap to check for updates.`}
+                  className="h-8 sm:h-9 px-3.5 rounded-full squircle-btn liquid-glass border border-border text-xs sm:text-sm font-mono font-semibold text-text-primary hover:bg-surface-elevated active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer select-none"
+                >
+                  <span className="font-mono">{APP_VERSION_LABEL}</span>
+                </button>
+              )}
             </div>
           </div>
+        ) : (
+          /* Web Browser View */
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+            {/* Left: Icon + Title & Subtitle */}
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl squircle-icon-sm liquid-glass border border-black/12 dark:border-white/18 flex items-center justify-center text-text-primary flex-shrink-0">
+                <Download size={18} />
+              </div>
 
-          {/* Right: Install Button */}
-          <div className="flex-shrink-0">
-            <a
-              href="/api/app-download"
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              aria-label="Download and install application"
-              className="h-9 px-4 rounded-full squircle-btn bg-text-primary text-background font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all duration-150 shadow-md hover:opacity-90 select-none"
-            >
-              <Download size={14} strokeWidth={2.2} />
-              <span>Install</span>
-            </a>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs xs:text-sm sm:text-base font-semibold text-text-primary truncate">
+                  Download Application
+                </span>
+                <span className="text-[11px] sm:text-xs text-text-muted truncate">
+                  Version {APP_VERSION_LABEL}
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Install Button */}
+            <div className="flex-shrink-0">
+              <a
+                href="/api/app-download"
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                aria-label="Download and install application"
+                className="h-9 px-4 rounded-full squircle-btn bg-text-primary text-background font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all duration-150 shadow-md hover:opacity-90 select-none"
+              >
+                <Download size={14} strokeWidth={2.2} />
+                <span>Install</span>
+              </a>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Full-Screen Payment Applications Selection Modal */}

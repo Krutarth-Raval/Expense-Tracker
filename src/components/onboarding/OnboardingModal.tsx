@@ -23,7 +23,7 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
     if (!user?.email) return;
 
     if (savings.trim() === "" || monthBalance.trim() === "") {
-      setError("Both Current Savings and Month Balance are compulsory to fill up");
+      setError("Both Current Savings and Salary Balance are compulsory to fill up");
       return;
     }
 
@@ -119,14 +119,14 @@ export function OnboardingModal({ isOpen, onComplete }: OnboardingModalProps) {
             </span>
           </div>
 
-          {/* Question 2: Current Month Balance */}
+          {/* Question 2: Current Salary Balance */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="onboarding-month-balance"
               className="text-xs sm:text-sm font-semibold text-text-secondary flex items-center gap-1.5"
             >
               <Wallet size={15} />
-              <span>Current Month Balance</span>
+              <span>Current Salary Balance</span>
             </label>
             <div className="relative w-full">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base sm:text-lg font-bold font-mono text-text-muted pointer-events-none">

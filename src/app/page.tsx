@@ -27,7 +27,7 @@ export default function Home() {
     );
   }
 
-  // First-time signup onboarding: Ask current savings & current month balance
+  // First-time signup onboarding: Ask current savings & current salary balance
   const showOnboarding = Boolean(user && user.onboardingCompleted === false);
 
   // Authenticated State: Tab Views

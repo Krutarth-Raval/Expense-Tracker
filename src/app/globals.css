@@ -49,8 +49,10 @@
      ========================================================================== */
   --navbar-pad: 8px;
   --toggle-pad: 3.5px;
-  --toggle-btn-size: 29px;
-  --toggle-gap: 2px;
+  --toggle-btn-width: 48px;
+  --toggle-btn-height: 30px;
+  --toggle-btn-size: var(--toggle-btn-width);
+  --toggle-gap: 2.5px;
   --navbar-logo-size: 36px;
 }
 
@@ -58,94 +60,117 @@
   :root {
     --navbar-pad: 10px;
     --toggle-pad: 4px;
-    --toggle-btn-size: 32px;
+    --toggle-btn-width: 52px;
+    --toggle-btn-height: 32px;
+    --toggle-btn-size: var(--toggle-btn-width);
     --toggle-gap: 3px;
     --navbar-logo-size: 40px;
   }
 }
 
 :root {
-
   /* ==========================================================================
-     2. SEMANTIC DESIGN TOKENS - LIGHT THEME (Apple Liquid Glass & Water Surface)
+     2. SEMANTIC DESIGN TOKENS - LIGHT THEME (Apple Crystalline Liquid Glass)
      ========================================================================== */
-  --color-background: #edf2f7;
-  --color-background-secondary: #f6f9fc;
-  --color-surface: rgba(255, 255, 255, 0.40);
-  --color-surface-elevated: rgba(255, 255, 255, 0.65);
-  
-  /* Physical Liquid Glass Base Tokens - Light Theme (Milky Translucent & Silver Reflections) */
-  --glass-background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.60) 0%,
-    rgba(255, 255, 255, 0.35) 45%,
-    rgba(255, 255, 255, 0.48) 100%
-  );
-  --glass-background-elevated: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.74) 0%,
-    rgba(255, 255, 255, 0.54) 100%
-  );
-  --glass-border: rgba(255, 255, 255, 0.75);
-  --glass-highlight: rgba(255, 255, 255, 0.98);
-  --glass-sheen: rgba(255, 255, 255, 0.38);
-  --glass-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 1px 1.5px 2px 0 rgba(255, 255, 255, 0.70),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
-    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.03),
-    0 2px 8px -1px rgba(12, 28, 48, 0.04),
-    0 14px 38px -4px rgba(12, 28, 48, 0.08);
-  --glass-blur: 26px;
+  --color-background: #f4f6fa;
+  --color-background-secondary: #ffffff;
+  --color-surface: rgba(255, 255, 255, 0.35);
+  --color-surface-elevated: rgba(255, 255, 255, 0.55);
 
-  /* Dedicated Liquid Glass Navbar Tokens - Light Theme */
-  --navbar-glass-bg: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.54) 0%,
-    rgba(255, 255, 255, 0.34) 100%
-  );
-  --navbar-glass-border: rgba(255, 255, 255, 0.80);
-  --navbar-glass-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 1px 1px 1.5px 0 rgba(255, 255, 255, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.30),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03),
-    0 8px 30px -4px rgba(12, 28, 48, 0.08),
-    0 2px 6px -1px rgba(12, 28, 48, 0.03);
+  /* Fluid Optical Environment - Light Theme */
+  --liquid-water-base: #f4f6fa;
+  --liquid-wave-1: rgba(198, 222, 248, 0.55);   /* Cerulean crystalline fluid current */
+  --liquid-wave-2: rgba(248, 238, 228, 0.50);   /* Warm pearlescent alabaster current */
+  --liquid-wave-3: rgba(222, 232, 250, 0.45);   /* Crystalline oceanic mist */
+  --liquid-caustic: rgba(255, 255, 255, 0.85);  /* Surface light refraction caustic */
+  --liquid-sheen: rgba(255, 255, 255, 0.50);
+  /* Refined, restrained optical prism dispersion (non-neon) */
+  --liquid-diffract-1: rgba(190, 225, 248, 0.28);
+  --liquid-diffract-2: rgba(226, 218, 250, 0.22);
+  --liquid-diffract-3: rgba(250, 228, 236, 0.18);
 
-  /* Dedicated Liquid Glass Bottom Bar Tokens - Light Theme */
-  --bottom-bar-glass-bg: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.58) 0%,
+  /* Hierarchical Glass Materials - Light Theme */
+  /* Tier 1: Header - Thin, elegant translucent glass */
+  --glass-bg-header: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.46) 0%,
+    rgba(255, 255, 255, 0.18) 52%,
+    rgba(255, 255, 255, 0.32) 100%
+  );
+  --glass-header-blur: 20px;
+  --glass-header-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.25),
+    0 4px 20px -2px rgba(18, 28, 48, 0.05);
+
+  /* Tier 2: Main Cards - Deeper frosted liquid glass with rich refractive depth */
+  --glass-bg-card: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.52) 0%,
+    rgba(255, 255, 255, 0.24) 44%,
     rgba(255, 255, 255, 0.38) 100%
   );
-  --bottom-bar-glass-border: rgba(255, 255, 255, 0.82);
-  --bottom-bar-glass-shadow: 
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
-    inset 1px 1.5px 2px 0 rgba(255, 255, 255, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
-    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.03),
-    0 16px 44px -6px rgba(12, 28, 48, 0.12),
-    0 4px 12px -2px rgba(12, 28, 48, 0.05);
+  --glass-bg-card-subtle: rgba(255, 255, 255, 0.22);
+  --glass-card-blur: 26px;
+  --glass-card-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.98),
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.035),
+    0 1px 3px 0 rgba(0, 0, 0, 0.02),
+    0 10px 32px -4px rgba(18, 28, 52, 0.06);
 
-  /* Raised Glass Lens Indicator Pill - Light Theme */
-  --pill-glass-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(240, 244, 250, 0.62) 100%
+  /* Tier 3: Floating Navigation - Dimensional, reflective floating lens */
+  --glass-bg-nav: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.68) 0%,
+    rgba(255, 255, 255, 0.36) 50%,
+    rgba(255, 255, 255, 0.54) 100%
   );
-  --pill-glass-border: rgba(255, 255, 255, 0.95);
-  --pill-glass-shadow: 
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.06),
-    0 3px 12px -1px rgba(12, 28, 48, 0.10);
+  --glass-nav-blur: 32px;
+  --glass-nav-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 1.0),
+    inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.50),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.04),
+    0 4px 14px -2px rgba(0, 0, 0, 0.04),
+    0 20px 48px -8px rgba(12, 22, 46, 0.12);
 
-  --color-text-primary: var(--neutral-900);
-  --color-text-secondary: var(--neutral-600);
-  --color-text-muted: var(--neutral-500);
-  --color-border: rgba(255, 255, 255, 0.70);
+  /* Tier 4: Small Controls & Badges - Compact glossy glass surfaces */
+  --glass-bg-control: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.46) 100%
+  );
+  --glass-control-blur: 24px;
+  --glass-control-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 1.0),
+    inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.50),
+    0 2px 8px 0 rgba(0, 0, 0, 0.05);
+
+  /* Directional Optical Borders (Variable Intensity Along Curved Edges) */
+  --glass-edge-top: rgba(255, 255, 255, 0.88);
+  --glass-edge-side: rgba(255, 255, 255, 0.38);
+  --glass-edge-bottom: rgba(255, 255, 255, 0.16);
+
+  /* Backward compatibility aliases */
+  --glass-background: var(--glass-bg-card);
+  --glass-background-elevated: var(--glass-bg-nav);
+  --glass-border: var(--glass-edge-top);
+  --glass-highlight: rgba(255, 255, 255, 0.98);
+  --glass-shadow: var(--glass-card-shadow);
+  --glass-blur: var(--glass-card-blur);
+  --floating-glass-bg: var(--glass-bg-nav);
+  --floating-glass-border: var(--glass-edge-top);
+  --floating-glass-shadow: var(--glass-nav-shadow);
+  --navbar-glass-bg: var(--glass-bg-header);
+  --navbar-glass-border: var(--glass-edge-top);
+  --navbar-glass-shadow: var(--glass-header-shadow);
+
+  --color-text-primary: #111111;
+  --color-text-secondary: #525252;
+  --color-text-muted: #737373;
+  --color-border: var(--glass-edge-top);
   --color-divider: rgba(0, 0, 0, 0.08);
-  --input-background: rgba(255, 255, 255, 0.40);
+  --input-background: rgba(255, 255, 255, 0.36);
 
   /* Expenses Calendar Heatmap Block Tokens - Light Theme */
   --calendar-block-0: var(--neutral-300);
@@ -154,94 +179,115 @@
   --calendar-block-3: var(--neutral-800);
   --calendar-block-4: var(--pure-black);
 
-  /* Fluid Liquid Water Background Tokens - Light Theme */
-  --liquid-wave-1: radial-gradient(ellipse at center, rgba(215, 232, 248, 0.70) 0%, rgba(198, 220, 242, 0.40) 50%, transparent 75%);
-  --liquid-wave-2: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(220, 235, 248, 0.50) 50%, transparent 75%);
-  --liquid-caustic: radial-gradient(ellipse at center, rgba(235, 245, 255, 0.85) 0%, rgba(210, 230, 248, 0.35) 50%, transparent 75%);
-  --liquid-pearlescent: linear-gradient(120deg, rgba(255, 255, 255, 0.70) 0%, rgba(205, 230, 255, 0.50) 30%, rgba(255, 225, 240, 0.38) 65%, rgba(220, 242, 250, 0.50) 100%);
+  /* Ambient Monochrome Background Tokens - Light Theme */
+  --ambient-orb-1: var(--liquid-wave-1);
+  --ambient-orb-2: var(--liquid-wave-2);
+  --ambient-orb-3: var(--liquid-caustic);
 }
 
 /* ==========================================================================
-   3. SEMANTIC DESIGN TOKENS - DARK THEME (Smoky Glass & Deep Obsidian Water)
+   3. SEMANTIC DESIGN TOKENS - DARK THEME (Apple Midnight Obsidian Liquid Glass)
    ========================================================================== */
 .dark, [data-theme="dark"] {
-  --color-background: #090a0d;
-  --color-background-secondary: #111317;
-  --color-surface: rgba(255, 255, 255, 0.04);
-  --color-surface-elevated: rgba(255, 255, 255, 0.08);
+  --color-background: #080a0f;
+  --color-background-secondary: #0e1219;
+  --color-surface: rgba(255, 255, 255, 0.035);
+  --color-surface-elevated: rgba(255, 255, 255, 0.065);
 
-  /* Physical Liquid Glass Base Tokens - Dark Theme (Smoky Translucent & Silver Edge Highlights) */
-  --glass-background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 42%,
-    rgba(18, 20, 24, 0.58) 100%
-  );
-  --glass-background-elevated: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(25, 28, 34, 0.72) 100%
-  );
-  --glass-border: rgba(255, 255, 255, 0.16);
-  --glass-highlight: rgba(255, 255, 255, 0.32);
-  --glass-sheen: rgba(255, 255, 255, 0.14);
-  --glass-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.30),
-    inset 1px 1.5px 2px 0 rgba(255, 255, 255, 0.16),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.50),
-    0 4px 12px -2px rgba(0, 0, 0, 0.55),
-    0 20px 48px -6px rgba(0, 0, 0, 0.78);
-  --glass-blur: 26px;
+  /* Fluid Optical Environment - Dark Theme */
+  --liquid-water-base: #080a0f;
+  --liquid-wave-1: rgba(18, 32, 54, 0.55);   /* Midnight Prussian blue fluid pool */
+  --liquid-wave-2: rgba(14, 38, 48, 0.42);   /* Abyssal teal fluid wave */
+  --liquid-wave-3: rgba(28, 24, 46, 0.35);   /* Smoky obsidian amethyst haze */
+  --liquid-caustic: rgba(200, 225, 255, 0.12); /* Silver moonlight surface refraction */
+  --liquid-sheen: rgba(255, 255, 255, 0.06);
+  /* Controlled dark prismatic refraction (smoky silver-teal-indigo) */
+  --liquid-diffract-1: rgba(30, 70, 95, 0.22);
+  --liquid-diffract-2: rgba(58, 48, 92, 0.18);
+  --liquid-diffract-3: rgba(78, 62, 98, 0.14);
 
-  /* Dedicated Liquid Glass Navbar Tokens - Dark Theme */
-  --navbar-glass-bg: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(16, 18, 22, 0.52) 100%
-  );
-  --navbar-glass-border: rgba(255, 255, 255, 0.18);
-  --navbar-glass-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.30),
-    inset 1px 1px 1.5px 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.45),
-    0 16px 40px -6px rgba(0, 0, 0, 0.70),
-    0 3px 10px -2px rgba(0, 0, 0, 0.45);
-
-  /* Dedicated Liquid Glass Bottom Bar Tokens - Dark Theme */
-  --bottom-bar-glass-bg: linear-gradient(
-    145deg,
+  /* Hierarchical Glass Materials - Dark Theme */
+  /* Tier 1: Header - Thin, elegant translucent obsidian glass */
+  --glass-bg-header: linear-gradient(
+    140deg,
     rgba(255, 255, 255, 0.07) 0%,
-    rgba(16, 18, 22, 0.56) 100%
+    rgba(255, 255, 255, 0.015) 55%,
+    rgba(255, 255, 255, 0.035) 100%
   );
-  --bottom-bar-glass-border: rgba(255, 255, 255, 0.20);
-  --bottom-bar-glass-shadow: 
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.32),
-    inset 1px 1.5px 2px 0 rgba(255, 255, 255, 0.16),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.50),
-    0 24px 56px -8px rgba(0, 0, 0, 0.82),
-    0 6px 16px -2px rgba(0, 0, 0, 0.50);
+  --glass-header-blur: 22px;
+  --glass-header-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.06),
+    0 6px 24px -4px rgba(0, 0, 0, 0.70);
 
-  /* Raised Glass Lens Indicator Pill - Dark Theme */
-  --pill-glass-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.20) 0%,
-    rgba(255, 255, 255, 0.09) 100%
+  /* Tier 2: Main Cards - Deeper frosted liquid glass with rich refractive depth */
+  --glass-bg-card: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 44%,
+    rgba(255, 255, 255, 0.045) 100%
   );
-  --pill-glass-border: rgba(255, 255, 255, 0.30);
-  --pill-glass-shadow: 
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.45),
-    0 4px 16px -2px rgba(0, 0, 0, 0.50);
+  --glass-bg-card-subtle: rgba(255, 255, 255, 0.025);
+  --glass-card-blur: 28px;
+  --glass-card-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.36),
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.45),
+    0 2px 6px 0 rgba(0, 0, 0, 0.40),
+    0 16px 44px -8px rgba(0, 0, 0, 0.88);
 
-  --color-text-primary: var(--pure-white);
-  --color-text-secondary: var(--neutral-400);
-  --color-text-muted: var(--neutral-500);
-  --color-border: rgba(255, 255, 255, 0.16);
+  /* Tier 3: Floating Navigation - Dimensional, reflective floating lens */
+  --glass-bg-nav: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.035) 50%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
+  --glass-nav-blur: 32px;
+  --glass-nav-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.48),
+    inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.65),
+    0 4px 16px -2px rgba(0, 0, 0, 0.55),
+    0 24px 58px -10px rgba(0, 0, 0, 0.96);
+
+  /* Tier 4: Small Controls & Badges - Compact glossy glass surfaces */
+  --glass-bg-control: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  --glass-control-blur: 24px;
+  --glass-control-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.10),
+    0 3px 12px 0 rgba(0, 0, 0, 0.50);
+
+  /* Directional Optical Borders (Silver / Platinum Micro-Refraction) */
+  --glass-edge-top: rgba(255, 255, 255, 0.30);
+  --glass-edge-side: rgba(255, 255, 255, 0.11);
+  --glass-edge-bottom: rgba(255, 255, 255, 0.04);
+
+  /* Backward compatibility aliases */
+  --glass-background: var(--glass-bg-card);
+  --glass-background-elevated: var(--glass-bg-nav);
+  --glass-border: var(--glass-edge-top);
+  --glass-highlight: rgba(255, 255, 255, 0.38);
+  --glass-shadow: var(--glass-card-shadow);
+  --glass-blur: var(--glass-card-blur);
+  --floating-glass-bg: var(--glass-bg-nav);
+  --floating-glass-border: var(--glass-edge-top);
+  --floating-glass-shadow: var(--glass-nav-shadow);
+  --navbar-glass-bg: var(--glass-bg-header);
+  --navbar-glass-border: var(--glass-edge-top);
+  --navbar-glass-shadow: var(--glass-header-shadow);
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-border: var(--glass-edge-top);
   --color-divider: rgba(255, 255, 255, 0.10);
-  --input-background: rgba(255, 255, 255, 0.045);
+  --input-background: rgba(255, 255, 255, 0.05);
 
   /* Expenses Calendar Heatmap Block Tokens - Dark Theme */
   --calendar-block-0: var(--neutral-800);
@@ -250,11 +296,10 @@
   --calendar-block-3: var(--neutral-300);
   --calendar-block-4: var(--pure-white);
 
-  /* Fluid Liquid Water Background Tokens - Dark Theme */
-  --liquid-wave-1: radial-gradient(ellipse at center, rgba(32, 38, 48, 0.50) 0%, rgba(18, 22, 28, 0.30) 50%, transparent 75%);
-  --liquid-wave-2: radial-gradient(ellipse at center, rgba(42, 50, 62, 0.35) 0%, rgba(20, 24, 32, 0.20) 50%, transparent 75%);
-  --liquid-caustic: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.07) 0%, rgba(50, 60, 75, 0.15) 50%, transparent 75%);
-  --liquid-pearlescent: linear-gradient(120deg, rgba(255, 255, 255, 0.05) 0%, rgba(160, 200, 255, 0.04) 30%, rgba(220, 180, 230, 0.03) 65%, rgba(255, 255, 255, 0.04) 100%);
+  /* Ambient Monochrome Background Tokens - Dark Theme */
+  --ambient-orb-1: var(--liquid-wave-1);
+  --ambient-orb-2: var(--liquid-wave-2);
+  --ambient-orb-3: var(--liquid-caustic);
 }
 
 /* ==========================================================================
@@ -408,140 +453,209 @@ body {
 }
 
 /* ==========================================================================
-   7. LIQUID GLASS UTILITIES (Apple-Inspired Physical Material)
+   7. LIQUID GLASS UTILITIES (Apple Physical Liquid Glass Material System)
    ========================================================================== */
-.liquid-glass {
+
+/* Tier 2: Main Cards (Deeper Frosted Liquid Glass) */
+.liquid-glass,
+.liquid-glass-card,
+.liquid-glass-rim {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(var(--glass-card-blur)) saturate(185%) contrast(102%) brightness(103%);
+  -webkit-backdrop-filter: blur(var(--glass-card-blur)) saturate(185%) contrast(102%) brightness(103%);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: var(--glass-edge-top) !important;
+  border-left-color: var(--glass-edge-side) !important;
+  border-right-color: var(--glass-edge-side) !important;
+  border-bottom-color: var(--glass-edge-bottom) !important;
+  box-shadow: var(--glass-card-shadow) !important;
   position: relative;
-  background: var(--glass-background);
-  backdrop-filter: blur(var(--glass-blur)) saturate(175%) contrast(102%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(175%) contrast(102%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
 
-/* Subtle Apple-style top-left directional specular sheen */
-.liquid-glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle at 14% 0%,
-    var(--glass-sheen) 0%,
-    rgba(255, 255, 255, 0.03) 32%,
-    transparent 65%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.liquid-glass > * {
-  position: relative;
-  z-index: 1;
+.dark .liquid-glass,
+.dark .liquid-glass-card,
+.dark .liquid-glass-rim,
+[data-theme="dark"] .liquid-glass,
+[data-theme="dark"] .liquid-glass-card,
+[data-theme="dark"] .liquid-glass-rim {
+  backdrop-filter: blur(var(--glass-card-blur)) saturate(180%) contrast(106%) brightness(96%);
+  -webkit-backdrop-filter: blur(var(--glass-card-blur)) saturate(180%) contrast(106%) brightness(96%);
 }
 
 .liquid-glass-elevated {
+  background: var(--glass-bg-nav);
+  backdrop-filter: blur(var(--glass-nav-blur)) saturate(190%) brightness(103%);
+  -webkit-backdrop-filter: blur(var(--glass-nav-blur)) saturate(190%) brightness(103%);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: var(--glass-edge-top) !important;
+  border-left-color: var(--glass-edge-side) !important;
+  border-right-color: var(--glass-edge-side) !important;
+  border-bottom-color: var(--glass-edge-bottom) !important;
+  box-shadow: var(--glass-nav-shadow) !important;
   position: relative;
-  background: var(--glass-background-elevated);
-  backdrop-filter: blur(30px) saturate(180%) contrast(102%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%) contrast(102%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
 
-.liquid-glass-elevated::before {
+/* Tier 1: Header (Thin, Elegant Translucent Glass) */
+header > nav,
+header .liquid-glass-header {
+  background: var(--glass-bg-header);
+  backdrop-filter: blur(var(--glass-header-blur)) saturate(180%) brightness(102%);
+  -webkit-backdrop-filter: blur(var(--glass-header-blur)) saturate(180%) brightness(102%);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: var(--glass-edge-top) !important;
+  border-left-color: var(--glass-edge-side) !important;
+  border-right-color: var(--glass-edge-side) !important;
+  border-bottom-color: var(--glass-edge-bottom) !important;
+  box-shadow: var(--glass-header-shadow) !important;
+  position: relative;
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+/* Theme Toggle Control inside Header (Tier 4: Compact Glossy Glass Surface) */
+header [role="radiogroup"].liquid-glass-nav {
+  background: var(--glass-bg-control);
+  backdrop-filter: blur(var(--glass-control-blur)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--glass-control-blur)) saturate(190%);
+  box-shadow: var(--glass-control-shadow) !important;
+}
+
+/* Tier 3: Floating Navigation (Dimensional, Highly Reflective Floating Lens) */
+nav[aria-label="Bottom Navigation Bar"] .liquid-glass-nav,
+.liquid-glass-nav,
+.liquid-glass-floating {
+  background: var(--glass-bg-nav);
+  backdrop-filter: blur(var(--glass-nav-blur)) saturate(200%) brightness(104%);
+  -webkit-backdrop-filter: blur(var(--glass-nav-blur)) saturate(200%) brightness(104%);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: var(--glass-edge-top) !important;
+  border-left-color: var(--glass-edge-side) !important;
+  border-right-color: var(--glass-edge-side) !important;
+  border-bottom-color: var(--glass-edge-bottom) !important;
+  box-shadow: var(--glass-nav-shadow) !important;
+  position: relative;
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+/* Tier 4: Small Controls & Badges (Compact Glossy Glass Surfaces) */
+.squircle-control,
+.liquid-glass-control {
+  background: var(--glass-bg-control);
+  backdrop-filter: blur(var(--glass-control-blur)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--glass-control-blur)) saturate(190%);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: var(--glass-edge-top) !important;
+  border-left-color: var(--glass-edge-side) !important;
+  border-right-color: var(--glass-edge-side) !important;
+  border-bottom-color: var(--glass-edge-bottom) !important;
+  box-shadow: var(--glass-control-shadow) !important;
+  position: relative;
+}
+
+/* Nested Glass Surfaces (Prevents opaque layering in transaction items) */
+.liquid-glass .liquid-glass {
+  background: var(--glass-bg-card-subtle);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.65),
+    0 1px 3px 0 rgba(0, 0, 0, 0.02);
+}
+
+.dark .liquid-glass .liquid-glass,
+[data-theme="dark"] .liquid-glass .liquid-glass {
+  background: var(--glass-bg-card-subtle);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.18),
+    0 2px 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Optical Parabolic Glass Surface Sheen (Mirrors overhead light bending across curved squircle edge) */
+.liquid-glass::before,
+.liquid-glass-nav::before,
+.liquid-glass-header::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(
-    circle at 16% 0%,
-    var(--glass-sheen) 0%,
-    transparent 60%
-  );
   pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 75% at 50% -15%,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.05) 42%,
+    transparent 72%
+  );
   z-index: 0;
 }
 
-.liquid-glass-elevated > * {
-  position: relative;
-  z-index: 1;
-}
-
-.liquid-glass-rim {
-  box-shadow: var(--glass-shadow);
-}
-
-/* Dedicated Authentic Liquid Glass Navbar Material */
-.liquid-glass-nav {
-  position: relative;
-  background: var(--navbar-glass-bg);
-  backdrop-filter: blur(24px) saturate(170%);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
-  border: 1px solid var(--navbar-glass-border);
-  box-shadow: var(--navbar-glass-shadow);
-  transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.liquid-glass-nav::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
+.dark .liquid-glass::before,
+.dark .liquid-glass-nav::before,
+.dark .liquid-glass-header::before,
+[data-theme="dark"] .liquid-glass::before,
+[data-theme="dark"] .liquid-glass-nav::before,
+[data-theme="dark"] .liquid-glass-header::before {
   background: radial-gradient(
-    circle at 12% 0%,
-    var(--glass-sheen) 0%,
-    transparent 55%
+    ellipse 120% 75% at 50% -15%,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.02) 38%,
+    transparent 68%
   );
-  pointer-events: none;
-  z-index: 0;
 }
 
-.liquid-glass-nav > * {
-  position: relative;
-  z-index: 1;
+/* Ensure form controls do not have double reflections */
+input.liquid-glass::before,
+textarea.liquid-glass::before {
+  display: none !important;
 }
 
-/* Dedicated Liquid Glass Bottom Bar Container Material */
-.liquid-glass-bottom-bar {
-  position: relative;
-  background: var(--bottom-bar-glass-bg);
-  backdrop-filter: blur(28px) saturate(175%);
-  -webkit-backdrop-filter: blur(28px) saturate(175%);
-  border: 1px solid var(--bottom-bar-glass-border);
-  box-shadow: var(--bottom-bar-glass-shadow);
-  transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.liquid-glass-bottom-bar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle at 15% 0%,
-    var(--glass-sheen) 0%,
-    transparent 50%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.liquid-glass-bottom-bar > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Raised Glass Lens Indicator Pill (Tactile Raised Physical Glass) */
+/* Active Bottom Bar Liquid Glass Pill: Raised convex glass lens appearance */
 .liquid-glass-active-pill {
-  background: var(--pill-glass-bg);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--pill-glass-border);
-  box-shadow: var(--pill-glass-shadow);
-  transition: all 150ms ease;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(240, 244, 252, 0.82) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: rgba(255, 255, 255, 1.0) !important;
+  border-left-color: rgba(255, 255, 255, 0.85) !important;
+  border-right-color: rgba(255, 255, 255, 0.85) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.50) !important;
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1.0),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05),
+    0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.dark .liquid-glass-active-pill,
+[data-theme="dark"] .liquid-glass-active-pill {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-top-color: rgba(255, 255, 255, 0.45) !important;
+  border-left-color: rgba(255, 255, 255, 0.25) !important;
+  border-right-color: rgba(255, 255, 255, 0.25) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.40),
+    0 4px 14px 0 rgba(0, 0, 0, 0.55);
 }
 
 /* Action Popup Squircle (Rule 01) */
@@ -552,81 +666,163 @@ body {
 }
 
 /* ==========================================================================
-   8. FLUID WATER & CAUSTIC BACKGROUND ANIMATIONS (GPU-Accelerated)
+   8. WATER-LIKE LIQUID ENVIRONMENT & REFRACTION ANIMATIONS
    ========================================================================== */
-@keyframes liquid-wave-1 {
+.water-current-1 {
+  background: radial-gradient(
+    ellipse 85% 75% at 30% 25%,
+    var(--liquid-wave-1) 0%,
+    var(--liquid-wave-2) 60%,
+    transparent 85%
+  );
+}
+
+.water-current-2 {
+  background: radial-gradient(
+    ellipse 80% 80% at 70% 75%,
+    var(--liquid-wave-2) 0%,
+    var(--liquid-wave-3) 55%,
+    transparent 85%
+  );
+}
+
+.water-current-3 {
+  background: radial-gradient(
+    ellipse 75% 65% at 40% 50%,
+    var(--liquid-wave-3) 0%,
+    var(--liquid-wave-1) 65%,
+    transparent 85%
+  );
+}
+
+/* Subtle, restrained optical prism dispersion (pure optical physics, non-neon) */
+.water-diffraction {
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    var(--liquid-diffract-1) 22%,
+    var(--liquid-diffract-2) 48%,
+    var(--liquid-diffract-3) 74%,
+    transparent 100%
+  );
+}
+
+/* Water surface light caustic refraction */
+.water-caustic {
+  background: radial-gradient(
+    ellipse 90% 60% at 50% 0%,
+    var(--liquid-caustic) 0%,
+    var(--liquid-sheen) 45%,
+    transparent 80%
+  );
+}
+
+/* Optical light distortion veil (subtle chromatic depth layer) */
+.water-optical-distortion {
+  background: radial-gradient(
+    ellipse 100% 70% at 50% 40%,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+.dark .water-optical-distortion,
+[data-theme="dark"] .water-optical-distortion {
+  background: radial-gradient(
+    ellipse 100% 70% at 50% 40%,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 70%
+  );
+}
+
+@keyframes water-wave-1 {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   }
-  33% {
-    transform: translate3d(4vw, 5vh, 0) scale(1.06) rotate(2deg);
-  }
-  66% {
-    transform: translate3d(-3vw, 2vh, 0) scale(0.96) rotate(-1.5deg);
+  50% {
+    transform: translate3d(35px, 40px, 0) scale(1.06) rotate(3deg);
   }
 }
 
-@keyframes liquid-wave-2 {
+@keyframes water-wave-2 {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   }
-  33% {
-    transform: translate3d(-4vw, -4vh, 0) scale(1.05) rotate(-2deg);
-  }
-  66% {
-    transform: translate3d(3vw, -2vh, 0) scale(0.97) rotate(1deg);
+  50% {
+    transform: translate3d(-40px, -35px, 0) scale(1.05) rotate(-2.5deg);
   }
 }
 
-@keyframes liquid-caustic {
+@keyframes water-wave-3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(25px, -20px, 0) scale(1.08);
+  }
+}
+
+@keyframes water-diffract {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(-1.5deg);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translate3d(30px, 25px, 0) scale(1.08) rotate(2deg);
+    opacity: 0.58;
+  }
+}
+
+@keyframes water-caustic {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1);
     opacity: 0.45;
   }
   50% {
-    transform: translate3d(3vw, -2vh, 0) scale(1.08);
+    transform: translate3d(0, 15px, 0) scale(1.04);
     opacity: 0.65;
   }
 }
 
-@keyframes pearlescent-drift {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(-12deg) scale(1);
-    opacity: 0.40;
-  }
-  50% {
-    transform: translate3d(5vw, 4vh, 0) rotate(-6deg) scale(1.05);
-    opacity: 0.60;
-  }
-}
-
-.animate-liquid-wave-1 {
-  animation: liquid-wave-1 26s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-water-wave-1 {
+  animation: water-wave-1 28s ease-in-out infinite;
   will-change: transform;
 }
 
-.animate-liquid-wave-2 {
-  animation: liquid-wave-2 32s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-water-wave-2 {
+  animation: water-wave-2 32s ease-in-out infinite;
   will-change: transform;
 }
 
-.animate-liquid-caustic {
-  animation: liquid-caustic 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-water-wave-3 {
+  animation: water-wave-3 24s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-water-diffract {
+  animation: water-diffract 34s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
-.animate-pearlescent-drift {
-  animation: pearlescent-drift 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-water-caustic {
+  animation: water-caustic 20s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-liquid-wave-1,
-  .animate-liquid-wave-2,
-  .animate-liquid-caustic,
-  .animate-pearlescent-drift {
-    animation: none !important;
-  }
+/* Backward compatibility ambient animations */
+.animate-ambient-drift-1 {
+  animation: water-wave-1 28s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ambient-drift-2 {
+  animation: water-wave-2 32s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ambient-pulse {
+  animation: water-caustic 20s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 /* ==========================================================================

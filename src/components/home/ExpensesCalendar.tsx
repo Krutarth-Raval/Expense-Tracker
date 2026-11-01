@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
+import { triggerHaptic } from "@/lib/haptics";
 
 export interface DayData {
   date: Date;
@@ -130,7 +131,7 @@ export function ExpensesCalendar({ dailyExpenses = {} }: ExpensesCalendarProps) 
   const selectedAmount = dailyExpenses[selectedDate] || 0;
 
   return (
-    <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col gap-3.5 sm:gap-4">
+    <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col gap-3.5 sm:gap-4">
       {/* 1. Section Title */}
       <div className="flex items-center justify-between">
         <span className="text-sm sm:text-base font-semibold text-text-primary">
@@ -141,8 +142,14 @@ export function ExpensesCalendar({ dailyExpenses = {} }: ExpensesCalendarProps) 
       {/* 2. Horizontally Scrollable Heatmap Grid (GitHub Commit Blocks) */}
       <div
         ref={scrollContainerRef}
-        className="w-full overflow-x-auto pb-1 scrollbar-none select-none touch-pan-x"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="w-full overflow-x-auto pb-1 scrollbar-none select-none"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          touchAction: "pan-x pan-y",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "auto",
+        }}
       >
         <div className="inline-flex flex-col gap-1 min-w-max">
           {/* Month labels row */}
@@ -185,8 +192,12 @@ export function ExpensesCalendar({ dailyExpenses = {} }: ExpensesCalendarProps) 
                       <button
                         key={day.dateStr}
                         type="button"
-                        onClick={() => setSelectedDate(day.dateStr)}
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setSelectedDate(day.dateStr);
+                        }}
                         aria-label={`${day.dateStr}: ${formatRupee(amount)}`}
+                        style={{ touchAction: "manipulation" }}
                         className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] sm:rounded-[4px] cursor-pointer transition-all duration-150 relative ${
                           !day.isCurrentYear
                             ? "opacity-0 pointer-events-none"

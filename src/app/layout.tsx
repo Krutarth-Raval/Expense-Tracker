@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { NavigationProvider } from "@/context/NavigationContext";
+import { UpdateProvider } from "@/context/UpdateContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { BottomBarWrapper } from "@/components/layout/BottomBarWrapper";
 import { SplashScreen } from "@/components/auth/SplashScreen";
@@ -59,15 +60,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col antialiased bg-background text-text-primary relative overflow-x-hidden">
+      <body className="min-h-full flex flex-col antialiased bg-background text-text-primary relative overflow-x-clip">
         <ThemeProvider>
           <AuthProvider>
             <NavigationProvider>
-              <AmbientBackground />
-              <SplashScreen />
-              <Navbar />
-              <main className="flex-1 flex flex-col w-full pb-24 sm:pb-28">{children}</main>
-              <BottomBarWrapper />
+              <UpdateProvider>
+                <AmbientBackground />
+                <SplashScreen />
+                <Navbar />
+                <main className="flex-1 flex flex-col w-full pb-36 sm:pb-44">{children}</main>
+                <BottomBarWrapper />
+              </UpdateProvider>
             </NavigationProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, QrCode } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface DirectPunchModalProps {
   isOpen: boolean;
@@ -33,8 +34,10 @@ export function DirectPunchModal({
   if (!isOpen) return null;
 
   const handlePunch = async () => {
+    triggerHaptic("medium");
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
+      triggerHaptic("error");
       setError("Please enter a valid amount");
       return;
     }
@@ -59,10 +62,14 @@ export function DirectPunchModal({
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        triggerHaptic("error");
         setError(data.error || "Failed to punch transaction");
         setIsSubmitting(false);
         return;
       }
+
+      // Success haptic pulse
+      triggerHaptic("success");
 
       // Reset form
       setReason("");
@@ -73,6 +80,7 @@ export function DirectPunchModal({
       onSuccess(data.transaction);
       onClose();
     } catch (err) {
+      triggerHaptic("error");
       console.error("Direct punch error:", err);
       setError("Network error. Please try again.");
       setIsSubmitting(false);
@@ -89,7 +97,10 @@ export function DirectPunchModal({
           </h3>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              triggerHaptic("light");
+              onClose();
+            }}
             aria-label="Close"
             className="w-8 h-8 rounded-full squircle-btn liquid-glass border border-border flex items-center justify-center text-text-primary hover:bg-surface-elevated active:scale-95 transition-all cursor-pointer"
           >
@@ -180,7 +191,10 @@ export function DirectPunchModal({
           <div className="flex justify-center pt-0.5">
             <button
               type="button"
-              onClick={onOpenScanner}
+              onClick={() => {
+                triggerHaptic("light");
+                onOpenScanner();
+              }}
               className="text-xs font-medium text-text-muted hover:text-text-primary flex items-center gap-1.5 transition-colors cursor-pointer py-1"
             >
               <QrCode size={13} />

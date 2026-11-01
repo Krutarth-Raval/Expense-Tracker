@@ -5,6 +5,7 @@ import { X, ExternalLink, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { ScannedMerchant } from "./UpiScannerModal";
 import { DEFAULT_PAYMENT_APPS } from "../profile/PaymentAppIcons";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface UpiPaymentModalProps {
   isOpen: boolean;
@@ -66,8 +67,10 @@ export function UpiPaymentModal({
   };
 
   const handlePay = async (selectedAppOverride?: string) => {
+    triggerHaptic("medium");
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
+      triggerHaptic("error");
       setError("Please enter a valid amount");
       return;
     }
@@ -91,11 +94,13 @@ export function UpiPaymentModal({
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        triggerHaptic("error");
         setError(data.error || "Failed to record payment");
         setIsSubmitting(false);
         return;
       }
 
+      triggerHaptic("success");
       const createdTx = data.transaction;
       setPendingTx(createdTx);
 

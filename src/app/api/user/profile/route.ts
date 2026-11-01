@@ -128,7 +128,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             success: false,
-            error: "Current month balance is compulsory and must be 0 or greater",
+            error: "Current Salary Balance is compulsory and must be 0 or greater",
           },
           { status: 400 }
         );

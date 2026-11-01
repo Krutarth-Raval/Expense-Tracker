@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { X, Zap, ZapOff } from "lucide-react";
+import { X, Zap, ZapOff, SwitchCamera, Camera, CameraOff } from "lucide-react";
 import jsQR from "jsqr";
+import { triggerHaptic } from "@/lib/haptics";
 
 export interface ScannedMerchant {
   merchantName: string;
@@ -62,7 +63,7 @@ function parseUpiData(rawText: string): ScannedMerchant | null {
         merchantName: url.hostname.replace(/^www\./, ""),
         merchantUpi: `${url.hostname.replace(/[^a-zA-Z0-9]/g, "")}@upi`,
       };
-    } catch {}
+    } catch { }
   }
 
   return {
@@ -129,13 +130,17 @@ export function UpiScannerModal({
   const streamRef = useRef<MediaStream | null>(null);
 
   const [hasCamera, setHasCamera] = useState<boolean>(false);
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(true);
+  const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [isTorchOn, setIsTorchOn] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [isRequesting, setIsRequesting] = useState(false);
   const [detectedMerchant, setDetectedMerchant] = useState<ScannedMerchant>({
     merchantName: "UPI Merchant",
     merchantUpi: "merchant@upi",
   });
 
-  // Stop camera stream tracks
+  // Stop all camera stream tracks
   const stopCameraTracks = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -143,6 +148,70 @@ export function UpiScannerModal({
     }
   }, []);
 
+  // Request camera and torch permissions, attach live stream
+  const startCamera = useCallback(
+    async (mode: "environment" | "user" = facingMode) => {
+      stopCameraTracks();
+      setIsRequesting(true);
+      setPermissionError(null);
+
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+        setPermissionError("Camera API is not supported on this device.");
+        setHasCamera(false);
+        setIsCameraActive(false);
+        setIsRequesting(false);
+        return;
+      }
+
+      try {
+        let stream: MediaStream;
+        try {
+          // Attempt preferred facing mode first
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: mode },
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
+            audio: false,
+          });
+        } catch {
+          // Fallback to general camera if exact mode constraint is rejected
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute("playsinline", "true");
+          await videoRef.current.play().catch(() => { });
+        }
+        setHasCamera(true);
+        setIsCameraActive(true);
+        setPermissionError(null);
+      } catch (err: unknown) {
+        console.warn("Camera permission / access error:", err);
+        setHasCamera(false);
+        setIsCameraActive(false);
+        const name = (err as { name?: string })?.name;
+        if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+          setPermissionError("Camera permission denied. Tap Enable to allow.");
+        } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+          setPermissionError("No camera found on this device.");
+        } else {
+          setPermissionError("Could not access camera. Tap Enable to retry.");
+        }
+      } finally {
+        setIsRequesting(false);
+      }
+    },
+    [facingMode, stopCameraTracks]
+  );
+
+  // Initialize camera stream when modal opens or facingMode changes
   useEffect(() => {
     if (!isOpen) {
       stopCameraTracks();
@@ -150,13 +219,18 @@ export function UpiScannerModal({
     }
 
     let isMounted = true;
+
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       return;
     }
 
     navigator.mediaDevices
       .getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       })
       .then((stream) => {
@@ -167,14 +241,25 @@ export function UpiScannerModal({
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.play().catch(() => {});
+          videoRef.current.setAttribute("playsinline", "true");
+          videoRef.current.play().catch(() => { });
         }
         setHasCamera(true);
+        setIsCameraActive(true);
+        setPermissionError(null);
       })
-      .catch((err) => {
-        console.warn("Camera access not available or denied:", err);
-        if (isMounted) {
-          setHasCamera(false);
+      .catch((err: unknown) => {
+        if (!isMounted) return;
+        console.warn("Camera permission / access error:", err);
+        setHasCamera(false);
+        setIsCameraActive(false);
+        const name = (err as { name?: string })?.name;
+        if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+          setPermissionError("Camera permission denied. Tap Enable to allow.");
+        } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+          setPermissionError("No camera found on this device.");
+        } else {
+          setPermissionError("Could not access camera. Tap Enable to retry.");
         }
       });
 
@@ -182,11 +267,11 @@ export function UpiScannerModal({
       isMounted = false;
       stopCameraTracks();
     };
-  }, [isOpen, stopCameraTracks]);
+  }, [isOpen, facingMode, stopCameraTracks]);
 
   // Live real-time QR code detection from video frames using optimized jsQR
   useEffect(() => {
-    if (!isOpen || !hasCamera) return;
+    if (!isOpen || !hasCamera || !isCameraActive) return;
 
     let isScanning = true;
     const scanCanvas = document.createElement("canvas");
@@ -210,12 +295,40 @@ export function UpiScannerModal({
       isScanning = false;
       clearInterval(intervalId);
     };
-  }, [isOpen, hasCamera]);
+  }, [isOpen, hasCamera, isCameraActive]);
+
+  // Turn Camera On / Off
+  const handleToggleCamera = async () => {
+    triggerHaptic("light");
+    if (isCameraActive && streamRef.current) {
+      stopCameraTracks();
+      setIsCameraActive(false);
+      setHasCamera(false);
+      setIsTorchOn(false);
+    } else {
+      await startCamera(facingMode);
+    }
+  };
+
+  // Flip Camera (Rear <-> Front)
+  const handleFlipCamera = async () => {
+    triggerHaptic("light");
+    const nextMode = facingMode === "environment" ? "user" : "environment";
+    setFacingMode(nextMode);
+    setIsTorchOn(false);
+    await startCamera(nextMode);
+  };
 
   // Toggle Torch/Flashlight
   const handleToggleTorch = async () => {
-    if (!streamRef.current) return;
-    const track = streamRef.current.getVideoTracks()[0];
+    triggerHaptic("light");
+    if (!isCameraActive || !streamRef.current) {
+      // If camera is off, turn on rear camera first
+      setFacingMode("environment");
+      await startCamera("environment");
+    }
+
+    const track = streamRef.current?.getVideoTracks()[0];
     if (track) {
       try {
         const nextState = !isTorchOn;
@@ -226,7 +339,7 @@ export function UpiScannerModal({
         });
         setIsTorchOn(nextState);
       } catch (e) {
-        console.warn("Failed to toggle torch constraint:", e);
+        console.warn("Torch constraint error:", e);
         setIsTorchOn((prev) => !prev);
       }
     }
@@ -234,6 +347,7 @@ export function UpiScannerModal({
 
   // Capture snapshot, run high-resolution QR decode, and proceed to payment modal
   const handlePayClick = () => {
+    triggerHaptic("medium");
     let photoDataUrl: string | undefined = undefined;
     let finalMerchant: ScannedMerchant = detectedMerchant;
 
@@ -277,29 +391,47 @@ export function UpiScannerModal({
       className="fixed inset-0 z-[120] bg-background flex flex-col justify-between overflow-hidden animate-in fade-in duration-200"
       style={{ backgroundColor: "var(--color-background)" }}
     >
-      {/* Top Header: Torch on Left, Close Cross on Right (Strictly themed, zero text) */}
+      {/* Top Header: Torch & Camera controls on Left, Close on Right */}
       <div
         className="relative z-10 w-full flex items-center justify-between px-5 sm:px-6 py-4"
         style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
       >
-        {/* Left Side: Torch Option */}
-        <button
-          type="button"
-          onClick={handleToggleTorch}
-          aria-label="Toggle Torch"
-          className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all cursor-pointer active:scale-95 ${
-            isTorchOn
-              ? "bg-text-primary text-background border-text-primary shadow-lg"
-              : "bg-surface-elevated text-text-primary border-border hover:opacity-80"
-          }`}
-        >
-          {isTorchOn ? <Zap size={20} /> : <ZapOff size={20} />}
-        </button>
+        {/* Left Side: Torch + Camera Toggle Options */}
+        <div className="flex items-center gap-2.5">
+          {/* Torch Button */}
+          <button
+            type="button"
+            onClick={handleToggleTorch}
+            aria-label={isTorchOn ? "Turn off torch" : "Turn on torch"}
+            className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all cursor-pointer active:scale-95 ${isTorchOn
+                ? "bg-text-primary text-background border-text-primary shadow-lg"
+                : "bg-surface-elevated text-text-primary border-border hover:opacity-80"
+              }`}
+          >
+            {isTorchOn ? <Zap size={20} /> : <ZapOff size={20} />}
+          </button>
 
-        {/* Right Side: Cross to Cancel */}
+          {/* Camera On / Off Toggle */}
+          <button
+            type="button"
+            onClick={handleToggleCamera}
+            aria-label={isCameraActive ? "Turn off camera" : "Turn on camera"}
+            className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all cursor-pointer active:scale-95 ${isCameraActive
+                ? "bg-surface-elevated text-text-primary border-border hover:opacity-80"
+                : "bg-rose-500/20 text-rose-500 border-rose-500/30 shadow-lg"
+              }`}
+          >
+            {isCameraActive ? <Camera size={20} /> : <CameraOff size={20} />}
+          </button>
+        </div>
+
+        {/* Right Side: Cross to Close */}
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            triggerHaptic("light");
+            onClose();
+          }}
           aria-label="Close Scanner"
           className="w-11 h-11 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-primary active:scale-95 transition-all cursor-pointer hover:opacity-80"
         >
@@ -307,19 +439,37 @@ export function UpiScannerModal({
         </button>
       </div>
 
-      {/* Center: Camera Box ONLY (Contained video stream) */}
+      {/* Center: Camera Box (Viewfinder) */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
         <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl overflow-hidden border-2 border-text-primary/70 bg-black shadow-2xl flex items-center justify-center">
-          {/* Live Camera Video Stream is strictly contained inside the box */}
+          {/* Live Camera Video Stream */}
           <video
             ref={videoRef}
             playsInline
             muted
             autoPlay
-            className={`w-full h-full object-cover transition-opacity duration-200 ${
-              hasCamera ? "opacity-100" : "opacity-0"
-            }`}
+            className={`w-full h-full object-cover transition-opacity duration-200 ${hasCamera && isCameraActive ? "opacity-100" : "opacity-0"
+              }`}
           />
+
+          {/* Fallback & Permission Prompt Screen */}
+          {(!hasCamera || !isCameraActive || permissionError) && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center bg-black/85 text-white gap-2.5">
+              <CameraOff size={32} className="text-zinc-400" />
+              <p className="text-xs text-zinc-300 font-medium px-2">
+                {permissionError || (isRequesting ? "Starting camera..." : "Camera is turned off")}
+              </p>
+              <button
+                type="button"
+                disabled={isRequesting}
+                onClick={() => startCamera(facingMode)}
+                className="mt-1 px-4 py-2 rounded-full squircle-btn bg-white text-black font-semibold text-xs flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer shadow-lg disabled:opacity-50"
+              >
+                <Camera size={14} />
+                <span>{isRequesting ? "Requesting..." : "Enable Camera"}</span>
+              </button>
+            </div>
+          )}
 
           {/* 4 Corner Markers */}
           <div className="absolute top-2.5 left-2.5 w-6 h-6 border-t-4 border-l-4 border-text-primary rounded-tl-lg pointer-events-none" />
@@ -327,23 +477,39 @@ export function UpiScannerModal({
           <div className="absolute bottom-2.5 left-2.5 w-6 h-6 border-b-4 border-l-4 border-text-primary rounded-bl-lg pointer-events-none" />
           <div className="absolute bottom-2.5 right-2.5 w-6 h-6 border-b-4 border-r-4 border-text-primary rounded-br-lg pointer-events-none" />
 
-          {/* Animated Scanning Beam Line */}
-          <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-text-primary to-transparent animate-scan pointer-events-none" />
+          {/* Animated Scanning Beam Line (Active when camera is running) */}
+          {hasCamera && isCameraActive && (
+            <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-text-primary to-transparent animate-scan pointer-events-none" />
+          )}
         </div>
       </div>
 
-      {/* Bottom: Themed Circular Click/Capture Button (Zero text) */}
+      {/* Bottom: Themed Circular Click/Capture Button + Flip Camera Option beside it */}
       <div
-        className="relative z-10 w-full flex items-center justify-center pb-8 sm:pb-10"
+        className="relative z-10 w-full flex items-center justify-center gap-6 pb-8 sm:pb-10"
         style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}
       >
+        {/* Left balance spacer */}
+        <div className="w-12 h-12 flex-shrink-0" />
+
+        {/* Center: Themed Circular Click/Capture Button */}
         <button
           type="button"
           onClick={handlePayClick}
           aria-label="Capture and Scan QR"
-          className="w-18 h-18 sm:w-20 sm:h-20 rounded-full border-4 border-text-primary/70 p-1 flex items-center justify-center active:scale-90 transition-transform cursor-pointer shadow-2xl focus:outline-none"
+          className="w-18 h-18 sm:w-20 sm:h-20 rounded-full border-4 border-text-primary/70 p-1 flex items-center justify-center active:scale-90 transition-transform cursor-pointer shadow-2xl focus:outline-none flex-shrink-0"
         >
           <div className="w-full h-full rounded-full bg-text-primary shadow-inner active:opacity-75 transition-opacity" />
+        </button>
+
+        {/* Side by the click: Flip Camera Option (Rear / Front) */}
+        <button
+          type="button"
+          onClick={handleFlipCamera}
+          aria-label={`Flip camera to ${facingMode === "environment" ? "front" : "rear"}`}
+          className="w-12 h-12 rounded-full squircle-btn bg-surface-elevated border border-border flex items-center justify-center text-text-primary active:scale-90 transition-transform cursor-pointer shadow-lg hover:opacity-80 flex-shrink-0"
+        >
+          <SwitchCamera size={22} strokeWidth={2} />
         </button>
       </div>
     </div>

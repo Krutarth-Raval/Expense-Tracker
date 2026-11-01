@@ -50,57 +50,23 @@ export function HomeDashboard() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [scannedMerchant, setScannedMerchant] = useState<ScannedMerchant | null>(null);
 
-  // Salary setup modal state (pops up once on signup, and every 24 hours if unconfigured)
+  // Salary setup modal state (pops up in a few seconds on Home)
   const [isSalarySetupOpen, setIsSalarySetupOpen] = useState(false);
 
   useEffect(() => {
     if (!userEmail) return;
 
-    // 1. If salary is already configured, do not show it
-    const isSalaryConfigured =
-      user?.salaryConfigured === true ||
-      (typeof window !== "undefined" &&
-        localStorage.getItem(`salary_configured_${userEmail}`) === "true");
+    const sessionKey = `seen_salary_setup_${userEmail}`;
+    const hasSeen = typeof window !== "undefined" ? sessionStorage.getItem(sessionKey) : "true";
+    if (!hasSeen) {
+      const timer = setTimeout(() => {
+        setIsSalarySetupOpen(true);
+        sessionStorage.setItem(sessionKey, "true");
+      }, 2500);
 
-    if (isSalaryConfigured) {
-      return;
+      return () => clearTimeout(timer);
     }
-
-    // 2. If not configured, ask only every 24 hours (or right after signup if never prompted)
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-    const localLastPrompt =
-      typeof window !== "undefined"
-        ? parseInt(localStorage.getItem(`salary_last_prompted_${userEmail}`) || "0", 10)
-        : 0;
-    const dbLastPrompt = user?.salaryPromptedAt
-      ? new Date(user.salaryPromptedAt).getTime()
-      : 0;
-    const lastPromptedTime = Math.max(localLastPrompt, dbLastPrompt);
-
-    const now = Date.now();
-    const shouldPrompt = !lastPromptedTime || now - lastPromptedTime >= ONE_DAY_MS;
-
-    if (!shouldPrompt) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setIsSalarySetupOpen(true);
-      if (typeof window !== "undefined") {
-        localStorage.setItem(`salary_last_prompted_${userEmail}`, String(now));
-      }
-      fetch("/api/user/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: userEmail,
-          salaryPromptedAt: new Date(now).toISOString(),
-        }),
-      }).catch(() => {});
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, [userEmail, user?.salaryConfigured, user?.salaryPromptedAt]);
+  }, [userEmail]);
 
   // Sync fresh profile from DB on mount
   useEffect(() => {
@@ -115,8 +81,8 @@ export function HomeDashboard() {
           const freshDay = freshUser.salaryDay
             ? freshUser.salaryDay
             : freshUser.salaryDate
-            ? new Date(freshUser.salaryDate).getUTCDate()
-            : 7;
+              ? new Date(freshUser.salaryDate).getUTCDate()
+              : 7;
           setSalaryDay(freshDay);
 
           if (
@@ -124,9 +90,6 @@ export function HomeDashboard() {
             !isNaN(freshUser.salaryAmount)
           ) {
             setSalaryAmount(freshUser.salaryAmount);
-          }
-          if (freshUser.salaryConfigured && typeof window !== "undefined") {
-            localStorage.setItem(`salary_configured_${userEmail}`, "true");
           }
           updateUserProfile(freshUser);
         }
@@ -185,7 +148,7 @@ export function HomeDashboard() {
   // Month cycle runs salaryDay to (salaryDay - 1) as per user's salary date selection.
   // Before salary date arrives in current calendar month (currentDay < salaryDay):
   // User is still in previous/initial cycle with starting remaining money (initialMonthBalance).
-  // Once salaryDay arrives, month balance updates with full monthly salary!
+  // Once salaryDay arrives, salary balance updates with full monthly salary!
   const isSalaryDayArrived = currentDay >= salaryDay;
   const baseMonthBalance = isSalaryDayArrived ? baseSalary : initialMonthBalance;
 
@@ -208,7 +171,7 @@ export function HomeDashboard() {
   // Money spent reflects current actual month spending (increases as transactions are made)
   const moneySpent = currentMonthSpent;
 
-  // Month balance is base monthly salary/remaining money minus current actual month money spent
+  // salary balance is base monthly salary/remaining money minus current actual month money spent
   // As user makes transactions, the remaining balance reduces
   const monthBalance = baseMonthBalance - currentMonthSpent;
 
@@ -228,7 +191,7 @@ export function HomeDashboard() {
   // Total savings: Initial savings plus any leftover/over-use from completed past cycles
   // Sums (monthly salary - expenses) for all past completed calendar months
   const totalSavings = useMemo(() => {
-    // If salary day has arrived in current month, the starting month balance leftover moves to savings!
+    // If salary day has arrived in current month, the starting salary balance leftover moves to savings!
     let savings = initialSavings + (isSalaryDayArrived && initialMonthBalance > 0 ? initialMonthBalance : 0);
 
     const monthlySpending: Record<string, number> = {};
@@ -266,12 +229,13 @@ export function HomeDashboard() {
     return `₹${absVal}`;
   };
 
-  // Helper to format month balance: "₹200" or "- ₹50" (No plus sign)
+  // Helper to format salary balance: "+ ₹200" or "- ₹50"
   const formatMonthBalance = (val: number): string => {
     const absVal = Math.abs(val).toLocaleString("en-IN", {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     });
+    if (val > 0) return `+ ₹${absVal}`;
     if (val < 0) return `- ₹${absVal}`;
     return `₹${absVal}`;
   };
@@ -281,6 +245,7 @@ export function HomeDashboard() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     });
+    if (val > 0) return `+ ₹${absVal}`;
     if (val < 0) return `- ₹${absVal}`;
     return `₹${absVal}`;
   };
@@ -306,150 +271,150 @@ export function HomeDashboard() {
   };
 
   return (
-    <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 animate-in fade-in zoom-in-95 duration-200">
-      {/* Top Row: Total Savings (Same layout as other 2 tiles: title at top left, amount at bottom in bigger font) */}
-      <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
-        {/* Top Left: Title + Percentage side-by-side */}
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
-              Total Savings
-            </span>
+      <div className="w-[96%] md:w-[94%] lg:w-[85%] max-w-5xl mx-auto flex flex-col gap-3.5 sm:gap-4 mt-3.5 sm:mt-5 pb-10 animate-in fade-in zoom-in-95 duration-200">
+        {/* Top Row: Total Savings (Same layout as other 2 tiles: title at top left, amount at bottom in bigger font) */}
+        <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+          {/* Top Left: Title + Percentage side-by-side */}
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
+                Total Savings
+              </span>
 
-            <span
-              className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold border bg-surface-elevated text-text-muted border-white/20 dark:border-white/10"
-            >
-              {formattedPercentage}%
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom Left: Large Money in bigger font */}
-        <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
-          {formatSavingsRupee(totalSavings)}
-        </div>
-      </div>
-
-      {/* Date: Bright, bigger, and bold above both tiles */}
-      <div className="px-1 text-sm sm:text-base font-bold text-text-primary select-none">
-        {currentDateFormatted}
-      </div>
-
-      {/* Side-by-side tiles: Month Balance & Money Spent */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
-        {/* Tile 1: Month Balance */}
-        <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
-          {/* Top Left: Title */}
-          <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
-            Month Balance
-          </span>
-
-          {/* Bottom Left: Large Money */}
-          <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
-            {formatMonthBalance(monthBalance)}
-          </div>
-        </div>
-
-        {/* Tile 2: Money Spent */}
-        <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
-          {/* Top Left: Title */}
-          <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
-            Money Spent
-          </span>
-
-          {/* Bottom Left: Large Money */}
-          <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
-            {formatRupee(moneySpent)}
-          </div>
-        </div>
-      </div>
-
-      {/* Expenses Calendar Section: GitHub Commit Block Heatmap */}
-      <ExpensesCalendar dailyExpenses={dailyExpensesMap} />
-
-      {/* Transaction History Section (Recent transactions for the actual current calendar month) */}
-      <div className="w-full squircle-card liquid-glass p-4 sm:p-5 flex flex-col gap-3.5 sm:gap-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm sm:text-base font-semibold text-text-primary">
-            Transaction History
-          </span>
-          <span className="text-xs font-mono text-text-muted">
-            {currentMonthTransactions.length} {currentMonthTransactions.length === 1 ? "transaction" : "transactions"}
-          </span>
-        </div>
-
-        {currentMonthTransactions.length === 0 ? (
-          <div className="py-8 text-center text-xs sm:text-sm text-text-muted font-mono">
-            No transactions in {currentMonthShort} {currentYear}. Click + to punch or scan QR to pay.
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2.5">
-            {currentMonthTransactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="w-full p-3.5 sm:p-4 rounded-2xl squircle-card liquid-glass border border-border flex flex-col gap-1.5"
+              <span
+                className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold border bg-surface-elevated text-text-muted border-border"
               >
-                {/* Top of the every transaction: Date */}
-                <span className="text-[11px] sm:text-xs font-mono font-medium text-text-muted">
-                  {formatDisplayDate(tx.date)}
-                </span>
+                {formattedPercentage}%
+              </span>
+            </div>
+          </div>
 
-                {/* Main row: Merchant name & email on left, Amount on right */}
-                <div className="flex items-center justify-between gap-3 min-w-0">
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm sm:text-base font-semibold text-text-primary truncate">
-                      {tx.merchantName}
-                    </span>
-                    <span className="text-xs text-text-muted truncate">
-                      {tx.email || userEmail}
-                    </span>
-                  </div>
+          {/* Bottom Left: Large Money in bigger font */}
+          <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
+            {formatSavingsRupee(totalSavings)}
+          </div>
+        </div>
 
-                  {/* Right side: Amount with gap between sign and money */}
-                  <div className="text-base sm:text-lg font-bold font-mono text-text-primary flex-shrink-0">
-                    - ₹{tx.amount.toLocaleString("en-IN", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    })}
+        {/* Date: Bright, bigger, and bold above both tiles */}
+        <div className="px-1 text-sm sm:text-base font-bold text-text-primary select-none">
+          {currentDateFormatted}
+        </div>
+
+        {/* Side-by-side tiles: Salary Balance & Money Spent */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
+          {/* Tile 1: Salary Balance */}
+          <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+            {/* Top Left: Title */}
+            <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
+              Salary Balance
+            </span>
+
+            {/* Bottom Left: Large Money */}
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
+              {formatMonthBalance(monthBalance)}
+            </div>
+          </div>
+
+          {/* Tile 2: Money Spent */}
+          <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col justify-between min-h-[100px] sm:min-h-[114px]">
+            {/* Top Left: Title */}
+            <span className="text-xs sm:text-sm font-semibold text-text-secondary leading-tight text-left">
+              Money Spent
+            </span>
+
+            {/* Bottom Left: Large Money */}
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono tracking-tight text-text-primary text-left truncate mt-3 sm:mt-4">
+              {formatRupee(moneySpent)}
+            </div>
+          </div>
+        </div>
+
+        {/* Expenses Calendar Section: GitHub Commit Block Heatmap */}
+        <ExpensesCalendar dailyExpenses={dailyExpensesMap} />
+
+        {/* Transaction History Section (Recent transactions for the actual current calendar month) */}
+        <div className="w-full squircle-card liquid-glass liquid-glass-rim border border-border p-4 sm:p-5 shadow-xl flex flex-col gap-3.5 sm:gap-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm sm:text-base font-semibold text-text-primary">
+              Transaction History
+            </span>
+            <span className="text-xs font-mono text-text-muted">
+              {currentMonthTransactions.length} {currentMonthTransactions.length === 1 ? "transaction" : "transactions"}
+            </span>
+          </div>
+
+          {currentMonthTransactions.length === 0 ? (
+            <div className="py-8 text-center text-xs sm:text-sm text-text-muted font-mono">
+              No transactions in {currentMonthShort} {currentYear}. Click + to punch or scan QR to pay.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {currentMonthTransactions.map((tx) => (
+                <div
+                  key={tx.id}
+                  className="w-full p-3.5 sm:p-4 rounded-2xl squircle-card liquid-glass border border-border flex flex-col gap-1.5"
+                >
+                  {/* Top of the every transaction: Date */}
+                  <span className="text-[11px] sm:text-xs font-mono font-medium text-text-muted">
+                    {formatDisplayDate(tx.date)}
+                  </span>
+
+                  {/* Main row: Merchant name & email on left, Amount on right */}
+                  <div className="flex items-center justify-between gap-3 min-w-0">
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="text-sm sm:text-base font-semibold text-text-primary truncate">
+                        {tx.merchantName}
+                      </span>
+                      <span className="text-xs text-text-muted truncate">
+                        {tx.email || userEmail}
+                      </span>
+                    </div>
+
+                    {/* Right side: Amount with gap between sign and money */}
+                    <div className="text-base sm:text-lg font-bold font-mono text-text-primary flex-shrink-0">
+                      - ₹{tx.amount.toLocaleString("en-IN", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* UPI QR Scanner Modal */}
+        <UpiScannerModal
+          isOpen={isQrScannerOpen}
+          onClose={closeQrScanner}
+          onProceedToPay={handleProceedToPay}
+        />
+
+        {/* UPI Payment Modal */}
+        <UpiPaymentModal
+          isOpen={isPaymentModalOpen}
+          merchant={scannedMerchant}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+
+        {/* Direct Punch Modal (Opened via + button) */}
+        <DirectPunchModal
+          isOpen={isDirectPunchOpen}
+          onClose={closeDirectPunch}
+          onSuccess={handlePaymentSuccess}
+          onOpenScanner={() => {
+            closeDirectPunch();
+            openQrScanner();
+          }}
+        />
+
+        {/* Monthly Salary Setup Modal (Pops up in a few seconds on Home) */}
+        <SalarySetupModal
+          isOpen={isSalarySetupOpen}
+          onClose={() => setIsSalarySetupOpen(false)}
+        />
       </div>
-
-      {/* UPI QR Scanner Modal */}
-      <UpiScannerModal
-        isOpen={isQrScannerOpen}
-        onClose={closeQrScanner}
-        onProceedToPay={handleProceedToPay}
-      />
-
-      {/* UPI Payment Modal */}
-      <UpiPaymentModal
-        isOpen={isPaymentModalOpen}
-        merchant={scannedMerchant}
-        onClose={() => setIsPaymentModalOpen(false)}
-        onPaymentSuccess={handlePaymentSuccess}
-      />
-
-      {/* Direct Punch Modal (Opened via + button) */}
-      <DirectPunchModal
-        isOpen={isDirectPunchOpen}
-        onClose={closeDirectPunch}
-        onSuccess={handlePaymentSuccess}
-        onOpenScanner={() => {
-          closeDirectPunch();
-          openQrScanner();
-        }}
-      />
-
-      {/* Monthly Salary Setup Modal (Pops up in a few seconds on Home) */}
-      <SalarySetupModal
-        isOpen={isSalarySetupOpen}
-        onClose={() => setIsSalarySetupOpen(false)}
-      />
-    </div>
-  );
+      );
 }
