@@ -5,8 +5,6 @@ import {
   GITHUB_APK_DIRECT_URL,
 } from "@/lib/version";
 
-export const dynamic = "force-dynamic";
-
 interface ReleaseAsset {
   name: string;
   updated_at: string;
@@ -90,6 +88,10 @@ export async function GET(req: Request) {
       releaseNotes: release.body || "Performance improvements and bug fixes.",
     });
   } catch (error) {
+    // If Next.js interrupts prerendering for dynamic bailout, rethrow so Next.js handles it cleanly
+    if ((error as { digest?: string })?.digest) {
+      throw error;
+    }
     console.warn("Failed to check for app updates:", error);
     return NextResponse.json({
       success: true,
