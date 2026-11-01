@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
-      APP_DOWNLOAD_URL: ${{ secrets.APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/latest' }}
-      NEXT_PUBLIC_APP_DOWNLOAD_URL: ${{ secrets.NEXT_PUBLIC_APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/latest' }}
+      APP_DOWNLOAD_URL: ${{ secrets.APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/download/latest/app-debug.apk' }}
+      NEXT_PUBLIC_APP_DOWNLOAD_URL: ${{ secrets.NEXT_PUBLIC_APP_DOWNLOAD_URL || 'https://github.com/Krutarth-Raval/Expense-Tracker/releases/download/latest/app-debug.apk' }}
+      CAPACITOR_SERVER_URL: 'https://track-your-money-one.vercel.app'
       CI: false
 
     steps:

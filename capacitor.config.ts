@@ -6,9 +6,13 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    ...(process.env.CAPACITOR_SERVER_URL ? { url: process.env.CAPACITOR_SERVER_URL, cleartext: true } : {})
+    url: process.env.CAPACITOR_SERVER_URL || 'https://track-your-money-one.vercel.app',
+    cleartext: false,
+    allowNavigation: [
+      'track-your-money-one.vercel.app',
+      '*.vercel.app'
+    ]
   }
 };
 
 export default config;
-
